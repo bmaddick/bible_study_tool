@@ -163,3 +163,97 @@ button:hover {
 #search-button {
     margin-top: 0.5rem;
 }
+
+/* AI Section Tabs */
+.ai-tabs {
+    display: flex;
+    gap: 0.5rem;
+    border-bottom: 2px solid var(--secondary-color);
+    margin-bottom: 1rem;
+}
+
+.ai-tab {
+    padding: 0.5rem 1rem;
+    background: none;
+    color: var(--secondary-color);
+    border: none;
+    cursor: pointer;
+    width: auto;
+}
+
+.ai-tab.active {
+    color: var(--primary-color);
+    border-bottom: 2px solid var(--primary-color);
+    margin-bottom: -2px;
+}
+
+/* AI Tab Content */
+.ai-tab-content {
+    display: none;
+    margin-bottom: 1rem;
+}
+
+.ai-tab-content.active {
+    display: block;
+}
+
+/* AI Forms */
+#debateForm, #apologeticsForm {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+#position1, #position2, #apologeticsQuery {
+    min-height: 100px;
+    resize: vertical;
+}
+
+/* AI Response Styling */
+.ai-response-container {
+    margin-top: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #E2E8F0;
+    border-radius: 0.375rem;
+}
+
+.ai-response h3 {
+    color: var(--primary-color);
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+}
+
+.ai-response h4 {
+    color: var(--secondary-color);
+    font-size: 1.1rem;
+    margin: 1rem 0 0.5rem;
+}
+
+.ai-response ul {
+    list-style-type: disc;
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.ai-response li {
+    margin-bottom: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .ai-tabs {
+        flex-direction: column;
+        gap: 0;
+        border-bottom: none;
+    }
+
+    .ai-tab {
+        border-bottom: 1px solid var(--secondary-color);
+        text-align: left;
+        padding: 1rem;
+    }
+
+    .ai-tab.active {
+        margin-bottom: 0;
+    }
+}

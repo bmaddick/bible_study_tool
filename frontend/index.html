@@ -38,9 +38,33 @@
             </section>
             <section id="aiSection" class="section">
                 <div class="ai-container">
-                    <textarea id="aiInput" placeholder="Ask a theological question..."></textarea>
-                    <button id="aiSubmit">Ask AI</button>
-                    <div id="aiResponse"></div>
+                    <div class="ai-tabs">
+                        <button class="ai-tab active" data-tab="general">General Questions</button>
+                        <button class="ai-tab" data-tab="debate">Debate Simulation</button>
+                        <button class="ai-tab" data-tab="apologetics">Apologetics</button>
+                    </div>
+
+                    <div id="generalTab" class="ai-tab-content active">
+                        <textarea id="aiInput" placeholder="Ask a theological question..."></textarea>
+                        <button id="aiSubmit">Ask AI</button>
+                    </div>
+
+                    <div id="debateTab" class="ai-tab-content">
+                        <form id="debateForm">
+                            <textarea id="position1" placeholder="Enter first theological position..."></textarea>
+                            <textarea id="position2" placeholder="Enter second theological position..."></textarea>
+                            <button type="submit">Simulate Debate</button>
+                        </form>
+                    </div>
+
+                    <div id="apologeticsTab" class="ai-tab-content">
+                        <form id="apologeticsForm">
+                            <textarea id="apologeticsQuery" placeholder="Ask about Christianity's validity, truth claims, or challenges..."></textarea>
+                            <button type="submit">Get Response</button>
+                        </form>
+                    </div>
+
+                    <div id="aiResponse" class="ai-response-container"></div>
                 </div>
             </section>
         </main>
