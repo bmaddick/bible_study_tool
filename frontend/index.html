@@ -1,13 +1,44 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Study Tool</title>
+    <link href="https://cdn.jsdelivr.net/npm/@chakra-ui/css/reset@2.3.1/dist/reset.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bible Study Tool</h1>
+            <nav>
+                <button id="readBtn" class="nav-btn active">Read Bible</button>
+                <button id="searchBtn" class="nav-btn">Search</button>
+                <button id="aiBtn" class="nav-btn">AI Assistant</button>
+            </nav>
+        </header>
+        <main>
+            <section id="readSection" class="section active">
+                <div class="bible-content">
+                    <div class="verse-container"></div>
+                </div>
+            </section>
+            <section id="searchSection" class="section">
+                <div class="search-container">
+                    <input type="text" id="searchInput" placeholder="Search by verse (e.g., John 3:16)">
+                    <button id="searchSubmit">Search</button>
+                    <div id="searchResults"></div>
+                </div>
+            </section>
+            <section id="aiSection" class="section">
+                <div class="ai-container">
+                    <textarea id="aiInput" placeholder="Ask a theological question..."></textarea>
+                    <button id="aiSubmit">Ask AI</button>
+                    <div id="aiResponse"></div>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="js/app.js" type="module"></script>
+</body>
 </html>
