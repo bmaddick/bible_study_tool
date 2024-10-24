@@ -16,17 +16,24 @@ A comprehensive Bible study application that combines scripture reading with AI-
 
 ## Project Structure
 
-- `/frontend` - React-based web application using Chakra UI
-  - Built with Vite
-  - Uses React 18
-  - Styled with Chakra UI
+- `/frontend` - Vanilla JavaScript web application
+  - `/js` - JavaScript modules
+    - `app.js` - Main application entry point
+    - `navigation.js` - Navigation and UI state management
+    - `bibleReader.js` - Bible content display
+    - `search.js` - Verse search functionality
+    - `ai.js` - AI interaction features
+  - `/css` - Styling
+    - `styles.css` - Application styles
+  - `/data` - Static data files
+    - `bible.json` - ESV Bible verses
 
 ## Development
 
 ### Prerequisites
 
-- Node.js (v18 or higher)
-- pnpm (preferred package manager)
+- Any modern web browser
+- A local web server (e.g., Python's `http.server` or VS Code's Live Server)
 
 ### Setup
 
@@ -36,18 +43,17 @@ A comprehensive Bible study application that combines scripture reading with AI-
    cd bible_study_tool
    ```
 
-2. Install frontend dependencies:
+2. Start a local web server:
    ```bash
-   cd frontend
-   pnpm install
+   # Using Python 3
+   python -m http.server 8000
+
+   # Or using Python 2
+   python -m SimpleHTTPServer 8000
    ```
 
-3. Start the development server:
-   ```bash
-   pnpm dev
-   ```
-
-The application will be available at `http://localhost:5173`.
+3. Open your browser:
+   Navigate to `http://localhost:8000/frontend/index.html`
 
 ## Contributing
 
