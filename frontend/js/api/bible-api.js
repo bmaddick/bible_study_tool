@@ -41,29 +41,21 @@ class BibleAPIService {
         // Parse reference format (e.g., "John 3:16")
         const [book, chapter, verse] = this.parseReference(reference);
 
-        // Find the book in the JSON data
-        const bookData = bibleData.find(b =>
-            b.name.toLowerCase() === book.toLowerCase() ||
-            b.abbrev.toLowerCase() === book.toLowerCase()
+        // Find the verse in the JSON data
+        const verseData = bibleData.verses.find(v =>
+            v.book_name.toLowerCase() === book.toLowerCase() &&
+            v.chapter === parseInt(chapter) &&
+            v.verse === parseInt(verse)
         );
 
-        if (!bookData) {
-            throw new Error(`Book "${book}" not found`);
-        }
-
-        // Get the verse from the specified chapter
-        const chapterIndex = parseInt(chapter) - 1;
-        const verseIndex = parseInt(verse) - 1;
-
-        if (!bookData.chapters[chapterIndex] ||
-            !bookData.chapters[chapterIndex][verseIndex]) {
+        if (!verseData) {
             throw new Error(`Verse ${reference} not found`);
         }
 
         return {
             reference,
-            text: bookData.chapters[chapterIndex][verseIndex],
-            version: this.isESVEnabled ? 'ESV' : 'KJV'
+            text: verseData.text,
+            version: this.isESVEnabled ? 'ESV' : 'ASV'
         };
     }
 
