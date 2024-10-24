@@ -1,13 +1,32 @@
+import { simulateDebate, formatDebateResponse } from './debate.js';
+import { handleApologeticsQuery, formatApologeticsResponse } from './apologetics.js';
+
 export function initializeAI() {
     const aiInput = document.getElementById('aiInput');
     const aiSubmit = document.getElementById('aiSubmit');
     const aiResponse = document.getElementById('aiResponse');
+    const debateForm = document.getElementById('debateForm');
+    const apologeticsForm = document.getElementById('apologeticsForm');
 
-    async function processAIRequest(prompt) {
+    async function processAIRequest(prompt, type = 'general') {
         try {
-            // In a real implementation, this would call an AI API
-            // For MVP, we'll provide some basic responses
-            const response = await simulateAIResponse(prompt);
+            aiResponse.innerHTML = 'Processing your request...';
+            let response;
+
+            switch (type) {
+                case 'debate':
+                    const [position1, position2] = prompt.split(' vs ');
+                    const debateResult = await simulateDebate(position1, position2);
+                    response = formatDebateResponse(debateResult);
+                    break;
+                case 'apologetics':
+                    const apologeticsResult = await handleApologeticsQuery(prompt);
+                    response = formatApologeticsResponse(apologeticsResult);
+                    break;
+                default:
+                    response = await handleGeneralQuery(prompt);
+            }
+
             displayAIResponse(response);
         } catch (error) {
             console.error('Error processing AI request:', error);
@@ -15,8 +34,7 @@ export function initializeAI() {
         }
     }
 
-    function simulateAIResponse(prompt) {
-        // Simple simulation of AI responses for MVP
+    async function handleGeneralQuery(prompt) {
         return new Promise((resolve) => {
             setTimeout(() => {
                 const responses = {
@@ -41,24 +59,23 @@ export function initializeAI() {
                     response: response,
                     timestamp: new Date().toISOString()
                 });
-            }, 1000); // Simulate API delay
+            }, 1000);
         });
     }
 
     function displayAIResponse(data) {
-        const content = `
+        aiResponse.innerHTML = `
             <div class="ai-response">
-                <p>${data.response}</p>
+                ${data.response}
                 <small>Response generated at: ${new Date(data.timestamp).toLocaleString()}</small>
             </div>
         `;
-        aiResponse.innerHTML = content;
     }
 
+    // Event Listeners
     aiSubmit.addEventListener('click', () => {
         const prompt = aiInput.value.trim();
         if (prompt) {
-            aiResponse.innerHTML = 'Processing your request...';
             processAIRequest(prompt);
         }
     });
@@ -68,9 +85,29 @@ export function initializeAI() {
             e.preventDefault();
             const prompt = aiInput.value.trim();
             if (prompt) {
-                aiResponse.innerHTML = 'Processing your request...';
                 processAIRequest(prompt);
             }
         }
     });
+
+    if (debateForm) {
+        debateForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const position1 = document.getElementById('position1').value.trim();
+            const position2 = document.getElementById('position2').value.trim();
+            if (position1 && position2) {
+                processAIRequest(`${position1} vs ${position2}`, 'debate');
+            }
+        });
+    }
+
+    if (apologeticsForm) {
+        apologeticsForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const query = document.getElementById('apologeticsQuery').value.trim();
+            if (query) {
+                processAIRequest(query, 'apologetics');
+            }
+        });
+    }
 }
