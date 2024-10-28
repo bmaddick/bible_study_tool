@@ -29,9 +29,8 @@
     <p>Check the console and results below for test output</p>
     <div id="results"></div>
 
-    <script type="module" src="js/api/bible-api.js"></script>
     <script type="module">
-        import { BibleAPIService } from './js/api/bible-api.js';
+        import { bibleAPI } from './js/api/bible-api.js';
 
         const testCases = [
             'Psalm 23:1',    // Test plural/singular handling
@@ -44,11 +43,10 @@
 
         async function runTests() {
             console.log('=== Testing Bible API with updated book name handling ===');
-            const api = new BibleAPIService();
 
             for (const reference of testCases) {
                 try {
-                    const verse = await api.getVerse(reference);
+                    const verse = await bibleAPI.getVerse(reference);
                     console.log(`\nSuccess for ${reference}:`, verse);
                     resultsDiv.innerHTML += `
                         <div class="success">
