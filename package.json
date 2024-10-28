@@ -1,0 +1,21 @@
+{
+    "name": "bible-study-tool",
+    "version": "1.0.0",
+    "description": "Bible Study Tool with AI-powered features",
+    "main": "frontend/index.html",
+    "scripts": {
+        "start": "http-server frontend -p 3000 -c-1",
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "keywords": [
+        "bible",
+        "study",
+        "ai",
+        "theology"
+    ],
+    "author": "",
+    "license": "ISC",
+    "devDependencies": {
+        "http-server": "^14.1.1"
+    }
+}
