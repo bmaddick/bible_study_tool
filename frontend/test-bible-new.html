@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Service Test</title>
+    <link rel="stylesheet" href="css/highlight-styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 8px;
+            margin-right: 10px;
+        }
+        #result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bible Service Test</h1>
+    <div class="controls">
+        <div>
+            <input type="text" id="verseInput" placeholder="Enter verse (e.g., Genesis 1:1)" />
+            <button id="lookupBtn">Look up verse</button>
+        </div>
+        <div>
+            <input type="text" id="searchInput" placeholder="Search text" />
+            <button id="searchBtn">Search</button>
+        </div>
+    </div>
+    <div id="result"></div>
+
+    <script type="module">
+        import { BibleService } from './js/bibleService.js';
+        import { HighlightService } from './js/highlightService.js';
+
+        const bibleService = new BibleService();
+        const highlightService = new HighlightService();
+
+        // Initialize services when the page loads
+        (async function initializeServices() {
+            try {
+                await bibleService.initialize();
+                highlightService.initialize();
+                console.log('Services initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize services:', error);
+                document.getElementById('result').innerHTML = `<p style="color: red">Failed to load Bible data: ${error.message}</p>`;
+            }
+        })();
+
+        function createVerseElement(verse) {
+            const div = document.createElement('div');
+            div.className = 'verse';
+            div.dataset.reference = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
+
+            const reference = document.createElement('span');
+            reference.className = 'verse-reference';
+            reference.textContent = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
+
+            const text = document.createElement('span');
+            text.className = 'verse-text';
+            text.textContent = verse.text;
+
+            div.appendChild(reference);
+            div.appendChild(text);
+
+            // Check if verse is highlighted
+            const highlight = highlightService.getHighlight(div.dataset.reference);
+            if (highlight) {
+                div.classList.add('highlighted');
+            }
+
+            return div;
+        }
+
+        async function lookupVerse() {
+            const reference = document.getElementById('verseInput').value;
+            try {
+                if (!bibleService.initialized) {
+                    throw new Error('Bible service is not yet initialized');
+                }
+                const verse = await bibleService.getVerse(reference);
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = '';
+                resultDiv.appendChild(createVerseElement(verse));
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p style="color: red">${error.message}</p>`;
+            }
+        }
+
+        async function searchVerses() {
+            const query = document.getElementById('searchInput').value;
+            try {
+                if (!bibleService.initialized) {
+                    throw new Error('Bible service is not yet initialized');
+                }
+                const verses = await bibleService.searchVerses(query);
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = '';
+
+                if (verses.length === 0) {
+                    resultDiv.innerHTML = '<p>No verses found matching your search.</p>';
+                    return;
+                }
+
+                verses.forEach(verse => {
+                    resultDiv.appendChild(createVerseElement(verse));
+                });
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p style="color: red">${error.message}</p>`;
+            }
+        }
+
+        // Add event listeners
+        document.getElementById('lookupBtn').addEventListener('click', lookupVerse);
+        document.getElementById('searchBtn').addEventListener('click', searchVerses);
+
+        // Add Enter key support
+        document.getElementById('verseInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') lookupVerse();
+        });
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchVerses();
+        });
+    </script>
+</body>
+</html>
