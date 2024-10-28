@@ -12,15 +12,17 @@
 }
 
 .highlight-toolbar {
-    position: absolute;
+    position: fixed;
     background: white;
     border: 1px solid #ccc;
     border-radius: 4px;
     padding: 5px;
     box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-    z-index: 1000;
-    display: flex;
+    z-index: 9999;
+    display: none;
     gap: 5px;
+    transform: translateX(-50%);
+    pointer-events: auto;
 }
 
 .highlight-toolbar button {
@@ -62,4 +64,40 @@
 .highlighted-text {
     background-color: rgba(255, 235, 59, 0.5);
     padding: 2px 0;
+}
+
+.verse-link {
+    color: #1976d2;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.2s;
+    display: inline-block;
+    margin: 2px 0;
+}
+
+.verse-link:hover {
+    color: #0d47a1;
+    text-decoration: underline;
+}
+
+.related-verses {
+    margin-top: 15px;
+    padding: 10px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    border-left: 4px solid #64b5f6;
+}
+
+.verse-container {
+    margin: 10px 0;
+    padding: 8px;
+    background-color: #fff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.verse-relevance {
+    font-size: 0.9em;
+    color: #666;
+    margin-left: 8px;
 }
