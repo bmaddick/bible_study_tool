@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Bible - Bible Study Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@chakra-ui/css/reset@2.3.1/dist/reset.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-link">Home</a>
+            <a href="study.html" class="nav-link active">Study Bible</a>
+            <a href="#questioning" class="nav-link">Questioning?</a>
+            <a href="#theological" class="nav-link">Theological questions</a>
+            <a href="#debate" class="nav-link">Theological debate</a>
+            <a href="#contact" class="nav-link">Contact</a>
+        </div>
+    </nav>
+
+    <main class="content">
+        <div class="bible-content">
+            <div class="verse-container"></div>
+        </div>
+        <div class="search-container">
+            <input type="text" id="verse-search" placeholder="Enter verse reference (e.g., John 3:16)" aria-label="Verse reference search">
+            <button id="search-button" aria-label="Search for verse">Search</button>
+        </div>
+        <div id="aiResponse" class="ai-response-container"></div>
+    </main>
+
+    <script src="js/app.js" type="module"></script>
+    <script src="js/bibleService.js" type="module"></script>
+    <script src="js/aiService.js" type="module"></script>
+    <script src="js/highlightService.js" type="module"></script>
+    <script src="js/displayService.js" type="module"></script>
+</body>
+</html>
