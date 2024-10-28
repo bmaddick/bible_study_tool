@@ -1,7 +1,7 @@
 :root {
     --primary-color: #2B6CB0;
     --secondary-color: #4A5568;
-    --background-color: #F7FAFC;
+    --background-color: #ffffff;
     --text-color: #1A202C;
     --error-color: #E53E3E;
     --success-color: #38A169;
@@ -12,8 +12,131 @@ body {
     background-color: var(--background-color);
     color: var(--text-color);
     line-height: 1.6;
+    margin: 0;
+    padding: 0;
 }
 
+/* Navigation styles */
+.main-nav {
+    background-color: white;
+    border-bottom: 1px solid #E2E8F0;
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+}
+
+.nav-link {
+    color: var(--text-color);
+    text-decoration: none;
+    font-size: 1rem;
+    transition: color 0.2s;
+}
+
+.nav-link:hover {
+    color: var(--primary-color);
+}
+
+/* Main content styles */
+.content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 3rem 2rem;
+}
+
+h1 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+}
+
+.scripture-quote {
+    text-align: center;
+    font-style: italic;
+    font-size: 1.25rem;
+    color: var(--secondary-color);
+    margin: 2rem 0;
+    padding: 0 2rem;
+}
+
+.getting-started {
+    margin-top: 4rem;
+}
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+
+.welcome {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    line-height: 1.8;
+}
+
+.steps {
+    counter-reset: step-counter;
+    list-style: none;
+    padding: 0;
+}
+
+.steps li {
+    counter-increment: step-counter;
+    margin-bottom: 2rem;
+    padding-left: 3rem;
+    position: relative;
+}
+
+.steps li::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2rem;
+    height: 2rem;
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.steps h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.encouragement {
+    margin: 3rem 0;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+.note {
+    background-color: #F7FAFC;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+}
+
+/* Hide functionality sections on landing page */
+#functionality-sections {
+    display: none;
+}
+
+/* Preserve existing functional styles */
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -241,6 +364,34 @@ button:hover {
 
 /* Responsive Design */
 @media (max-width: 768px) {
+    .nav-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .content {
+        padding: 2rem 1rem;
+    }
+
+    h1 {
+        font-size: 2rem;
+    }
+
+    .scripture-quote {
+        font-size: 1.1rem;
+        padding: 0 1rem;
+    }
+
+    .steps li {
+        padding-left: 2.5rem;
+    }
+
+    .steps li::before {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+
     .ai-tabs {
         flex-direction: column;
         gap: 0;
