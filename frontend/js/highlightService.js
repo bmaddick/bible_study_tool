@@ -2,6 +2,8 @@
 export class HighlightService {
     constructor() {
         this.highlights = new Map(); // Maps verse references to highlight data
+        this.currentVerseReference = null;
+        this.currentSelectedText = null;
     }
 
     // Add highlight to a verse
@@ -12,6 +14,7 @@ export class HighlightService {
             timestamp: new Date().toISOString()
         });
         this.saveHighlights();
+        this.applyHighlightToDOM(verseReference, selectedText);
     }
 
     // Remove highlight from a verse
@@ -44,6 +47,10 @@ export class HighlightService {
         const savedHighlights = localStorage.getItem('bibleHighlights');
         if (savedHighlights) {
             this.highlights = new Map(JSON.parse(savedHighlights));
+            // Apply saved highlights to DOM
+            this.highlights.forEach((data, reference) => {
+                this.applyHighlightToDOM(reference, data.text);
+            });
         }
     }
 
@@ -51,13 +58,22 @@ export class HighlightService {
     initialize() {
         this.loadHighlights();
         this.setupSelectionListener();
+        this.setupToolbarListeners();
+        // Add click outside listener to hide toolbar
+        document.addEventListener('click', (e) => {
+            const toolbar = document.getElementById('highlightToolbar');
+            if (toolbar && !toolbar.contains(e.target)) {
+                toolbar.style.display = 'none';
+            }
+        });
     }
 
     // Set up listener for text selection
     setupSelectionListener() {
-        document.addEventListener('mouseup', () => {
+        document.addEventListener('mouseup', (e) => {
+            const toolbar = document.getElementById('highlightToolbar');
             const selection = window.getSelection();
-            if (selection.toString().trim()) {
+            if (selection.toString().trim() && !toolbar.contains(e.target)) {
                 this.handleTextSelection(selection);
             }
         });
@@ -74,52 +90,81 @@ export class HighlightService {
         const verseReference = verseElement.dataset.reference;
         if (!verseReference) return;
 
-        // Create highlight toolbar
-        this.showHighlightToolbar(selection, verseReference, selectedText);
+        this.currentVerseReference = verseReference;
+        this.currentSelectedText = selectedText;
+        this.showHighlightToolbar(selection);
     }
 
     // Show highlight toolbar with AI interaction options
-    showHighlightToolbar(selection, verseReference, selectedText) {
-        const toolbar = document.createElement('div');
-        toolbar.className = 'highlight-toolbar';
-        toolbar.innerHTML = `
-            <button class="highlight-btn">Highlight</button>
-            <button class="meaning-btn">Get Meaning</button>
-            <button class="related-btn">Find Related Verses</button>
-        `;
+    showHighlightToolbar(selection) {
+        const toolbar = document.getElementById('highlightToolbar');
+        if (!toolbar) return;
 
-        // Position toolbar near selection
         const range = selection.getRangeAt(0);
         const rect = range.getBoundingClientRect();
-        toolbar.style.position = 'absolute';
-        toolbar.style.top = `${rect.bottom + window.scrollY + 10}px`;
-        toolbar.style.left = `${rect.left + window.scrollX}px`;
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
 
-        // Add event listeners
-        toolbar.querySelector('.highlight-btn').addEventListener('click', () => {
-            this.addHighlight(verseReference, selectedText);
-            toolbar.remove();
-        });
+        toolbar.style.display = 'flex';
+        toolbar.style.left = `${rect.left + scrollLeft}px`;
+        toolbar.style.top = `${rect.bottom + scrollTop + 5}px`;
 
-        toolbar.querySelector('.meaning-btn').addEventListener('click', () => {
-            this.requestVerseMeaning(verseReference, selectedText);
-            toolbar.remove();
-        });
+        // Ensure toolbar stays within viewport
+        const toolbarRect = toolbar.getBoundingClientRect();
+        if (toolbarRect.right > window.innerWidth) {
+            toolbar.style.left = `${window.innerWidth - toolbarRect.width - 10}px`;
+        }
+    }
 
-        toolbar.querySelector('.related-btn').addEventListener('click', () => {
-            this.findRelatedVerses(verseReference, selectedText);
-            toolbar.remove();
-        });
+    // Apply highlight to DOM
+    applyHighlightToDOM(verseReference, text) {
+        const verseElement = document.querySelector(`.verse[data-reference="${verseReference}"]`);
+        if (!verseElement) return;
 
-        // Remove toolbar when clicking outside
-        document.addEventListener('mousedown', function closeToolbar(e) {
-            if (!toolbar.contains(e.target)) {
-                toolbar.remove();
-                document.removeEventListener('mousedown', closeToolbar);
+        const verseText = verseElement.textContent;
+        const startIndex = verseText.indexOf(text);
+        if (startIndex === -1) return;
+
+        const span = document.createElement('span');
+        span.className = 'highlighted-text';
+        span.textContent = text;
+
+        const range = document.createRange();
+        const textNode = Array.from(verseElement.childNodes)
+            .find(node => node.nodeType === Node.TEXT_NODE && node.textContent.includes(text));
+
+        if (textNode) {
+            range.setStart(textNode, startIndex);
+            range.setEnd(textNode, startIndex + text.length);
+            range.surroundContents(span);
+        }
+    }
+
+    // Set up toolbar button listeners
+    setupToolbarListeners() {
+        const toolbar = document.getElementById('highlightToolbar');
+        if (!toolbar) return;
+
+        document.getElementById('highlightBtn').addEventListener('click', () => {
+            if (this.currentVerseReference && this.currentSelectedText) {
+                this.addHighlight(this.currentVerseReference, this.currentSelectedText);
+                toolbar.style.display = 'none';
             }
         });
 
-        document.body.appendChild(toolbar);
+        document.getElementById('meaningBtn').addEventListener('click', () => {
+            if (this.currentVerseReference && this.currentSelectedText) {
+                this.requestVerseMeaning(this.currentVerseReference, this.currentSelectedText);
+                toolbar.style.display = 'none';
+            }
+        });
+
+        document.getElementById('relatedBtn').addEventListener('click', () => {
+            if (this.currentVerseReference && this.currentSelectedText) {
+                this.findRelatedVerses(this.currentVerseReference, this.currentSelectedText);
+                toolbar.style.display = 'none';
+            }
+        });
     }
 
     // Request verse meaning from AI service (placeholder)

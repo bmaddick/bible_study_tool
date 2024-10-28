@@ -22,6 +22,18 @@
         #result {
             margin-top: 20px;
         }
+        .highlight-toolbar {
+            display: none;
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .highlight-toolbar button {
+            margin: 0 4px;
+        }
     </style>
 </head>
 <body>
@@ -37,6 +49,11 @@
         </div>
     </div>
     <div id="result"></div>
+    <div id="highlightToolbar" class="highlight-toolbar">
+        <button id="highlightBtn">Highlight</button>
+        <button id="meaningBtn">Get Meaning</button>
+        <button id="relatedBtn">Find Related</button>
+    </div>
 
     <script type="module">
         import { BibleService } from './js/bibleService.js';
@@ -44,13 +61,18 @@
 
         const bibleService = new BibleService();
         const highlightService = new HighlightService();
+        let servicesInitialized = false;
 
         // Initialize services when the page loads
         (async function initializeServices() {
             try {
                 await bibleService.initialize();
                 highlightService.initialize();
+                servicesInitialized = true;
                 console.log('Services initialized successfully');
+                // Enable buttons after initialization
+                document.getElementById('lookupBtn').disabled = false;
+                document.getElementById('searchBtn').disabled = false;
             } catch (error) {
                 console.error('Failed to initialize services:', error);
                 document.getElementById('result').innerHTML = `<p style="color: red">Failed to load Bible data: ${error.message}</p>`;
@@ -83,11 +105,12 @@
         }
 
         async function lookupVerse() {
+            if (!servicesInitialized) {
+                document.getElementById('result').innerHTML = '<p style="color: red">Please wait for services to initialize...</p>';
+                return;
+            }
             const reference = document.getElementById('verseInput').value;
             try {
-                if (!bibleService.initialized) {
-                    throw new Error('Bible service is not yet initialized');
-                }
                 const verse = await bibleService.getVerse(reference);
                 const resultDiv = document.getElementById('result');
                 resultDiv.innerHTML = '';
@@ -98,11 +121,12 @@
         }
 
         async function searchVerses() {
+            if (!servicesInitialized) {
+                document.getElementById('result').innerHTML = '<p style="color: red">Please wait for services to initialize...</p>';
+                return;
+            }
             const query = document.getElementById('searchInput').value;
             try {
-                if (!bibleService.initialized) {
-                    throw new Error('Bible service is not yet initialized');
-                }
                 const verses = await bibleService.searchVerses(query);
                 const resultDiv = document.getElementById('result');
                 resultDiv.innerHTML = '';
@@ -119,6 +143,10 @@
                 document.getElementById('result').innerHTML = `<p style="color: red">${error.message}</p>`;
             }
         }
+
+        // Disable buttons until initialization is complete
+        document.getElementById('lookupBtn').disabled = true;
+        document.getElementById('searchBtn').disabled = true;
 
         // Add event listeners
         document.getElementById('lookupBtn').addEventListener('click', lookupVerse);
