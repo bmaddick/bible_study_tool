@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Service Test</title>
+    <link rel="stylesheet" href="css/highlight-styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .controls {
+            margin-bottom: 20px;
+        }
+        input, button {
+            padding: 8px;
+            margin-right: 10px;
+        }
+        #result {
+            margin-top: 20px;
+        }
+        .highlight-toolbar {
+            display: none;
+            position: absolute;
+            background: white;
+            border: 1px solid #ccc;
+            padding: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            z-index: 1000;
+        }
+        .highlight-toolbar button {
+            margin: 0 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bible Service Test</h1>
+    <div class="controls">
+        <div>
+            <input type="text" id="verseInput" placeholder="Enter verse (e.g., Genesis 1:1)" />
+            <button id="lookupBtn">Look up verse</button>
+        </div>
+        <div>
+            <input type="text" id="searchInput" placeholder="Search text" />
+            <button id="searchBtn">Search</button>
+        </div>
+    </div>
+    <div id="result"></div>
+    <div id="highlightToolbar" class="highlight-toolbar">
+        <button id="highlightBtn">Highlight</button>
+        <button id="meaningBtn">Get Meaning</button>
+        <button id="relatedBtn">Find Related</button>
+    </div>
+
+    <script type="module">
+        import { BibleService } from './js/bibleService.js';
+        import { HighlightService } from './js/highlightService.js';
+
+        const bibleService = new BibleService();
+        const highlightService = new HighlightService();
+        let servicesInitialized = false;
+
+        // Initialize services when the page loads
+        (async function initializeServices() {
+            try {
+                await bibleService.initialize();
+                highlightService.initialize();
+                servicesInitialized = true;
+                console.log('Services initialized successfully');
+                // Enable buttons after initialization
+                document.getElementById('lookupBtn').disabled = false;
+                document.getElementById('searchBtn').disabled = false;
+            } catch (error) {
+                console.error('Failed to initialize services:', error);
+                document.getElementById('result').innerHTML = `<p style="color: red">Failed to load Bible data: ${error.message}</p>`;
+            }
+        })();
+
+        function createVerseElement(verse) {
+            const div = document.createElement('div');
+            div.className = 'verse';
+            div.dataset.reference = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
+
+            const reference = document.createElement('span');
+            reference.className = 'verse-reference';
+            reference.textContent = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
+
+            const text = document.createElement('span');
+            text.className = 'verse-text';
+            text.textContent = verse.text;
+
+            div.appendChild(reference);
+            div.appendChild(text);
+
+            // Check if verse is highlighted
+            const highlight = highlightService.getHighlight(div.dataset.reference);
+            if (highlight) {
+                div.classList.add('highlighted');
+            }
+
+            return div;
+        }
+
+        async function lookupVerse() {
+            if (!servicesInitialized) {
+                document.getElementById('result').innerHTML = '<p style="color: red">Please wait for services to initialize...</p>';
+                return;
+            }
+            const reference = document.getElementById('verseInput').value;
+            try {
+                const verse = await bibleService.getVerse(reference);
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = '';
+                resultDiv.appendChild(createVerseElement(verse));
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p style="color: red">${error.message}</p>`;
+            }
+        }
+
+        async function searchVerses() {
+            if (!servicesInitialized) {
+                document.getElementById('result').innerHTML = '<p style="color: red">Please wait for services to initialize...</p>';
+                return;
+            }
+            const query = document.getElementById('searchInput').value;
+            try {
+                const verses = await bibleService.searchVerses(query);
+                const resultDiv = document.getElementById('result');
+                resultDiv.innerHTML = '';
+
+                if (verses.length === 0) {
+                    resultDiv.innerHTML = '<p>No verses found matching your search.</p>';
+                    return;
+                }
+
+                verses.forEach(verse => {
+                    resultDiv.appendChild(createVerseElement(verse));
+                });
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p style="color: red">${error.message}</p>`;
+            }
+        }
+
+        // Disable buttons until initialization is complete
+        document.getElementById('lookupBtn').disabled = true;
+        document.getElementById('searchBtn').disabled = true;
+
+        // Add event listeners
+        document.getElementById('lookupBtn').addEventListener('click', lookupVerse);
+        document.getElementById('searchBtn').addEventListener('click', searchVerses);
+
+        // Add Enter key support
+        document.getElementById('verseInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') lookupVerse();
+        });
+        document.getElementById('searchInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchVerses();
+        });
+    </script>
+</body>
+</html>

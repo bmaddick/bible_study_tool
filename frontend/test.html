@@ -1,0 +1,70 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #results {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Bible API Test</h1>
+    <p>Check the console and results below for test output</p>
+    <div id="results"></div>
+
+    <script type="module">
+        import { bibleAPI } from './js/api/bible-api.js';
+
+        const testCases = [
+            'Psalm 23:1',    // Test plural/singular handling
+            'Psalms 23:1',   // Test original name
+            'John 3:16',     // Test working case
+            'Genesis 1:1'    // Test another working case
+        ];
+
+        const resultsDiv = document.getElementById('results');
+
+        async function runTests() {
+            console.log('=== Testing Bible API with updated book name handling ===');
+
+            for (const reference of testCases) {
+                try {
+                    const verse = await bibleAPI.getVerse(reference);
+                    console.log(`\nSuccess for ${reference}:`, verse);
+                    resultsDiv.innerHTML += `
+                        <div class="success">
+                            <strong>${reference}</strong>: ${verse.text}
+                        </div>
+                    `;
+                } catch (error) {
+                    console.error(`\nError for ${reference}:`, error.message);
+                    resultsDiv.innerHTML += `
+                        <div class="error">
+                            <strong>${reference}</strong>: ${error.message}
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        runTests();
+    </script>
+</body>
+</html>

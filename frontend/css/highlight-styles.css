@@ -1,0 +1,65 @@
+/* Styles for verse highlighting and toolbar */
+.verse {
+    position: relative;
+    padding: 5px;
+    margin: 5px 0;
+    border-radius: 4px;
+    cursor: text;
+}
+
+.verse.highlighted {
+    background-color: rgba(255, 235, 59, 0.3);
+}
+
+.highlight-toolbar {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 1000;
+    display: flex;
+    gap: 5px;
+}
+
+.highlight-toolbar button {
+    padding: 5px 10px;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+}
+
+.highlight-toolbar .highlight-btn {
+    background-color: #ffeb3b;
+}
+
+.highlight-toolbar .meaning-btn {
+    background-color: #81c784;
+    color: white;
+}
+
+.highlight-toolbar .related-btn {
+    background-color: #64b5f6;
+    color: white;
+}
+
+.highlight-toolbar button:hover {
+    opacity: 0.9;
+}
+
+.verse-reference {
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.verse-text {
+    line-height: 1.5;
+}
+
+.highlighted-text {
+    background-color: rgba(255, 235, 59, 0.5);
+    padding: 2px 0;
+}
