@@ -2,76 +2,151 @@
 class BibleAPIService {
     constructor() {
         this.cache = new Map();
-        this.isESVEnabled = false; // Will be true when ESV API key is configured
+        this.version = 'ASV';
+        this.bibleData = null;
+        this.bookIndexMap = new Map();
+        this.bookNameVariants = new Map();
     }
 
     async getVerse(reference) {
         if (this.cache.has(reference)) {
             return this.cache.get(reference);
         }
-
-        if (this.isESVEnabled) {
-            // ESV API integration will go here when API key is available
-            return this.fetchFromESVAPI(reference);
-        }
-
         return this.fetchFromLocalJSON(reference);
     }
 
     async fetchFromLocalJSON(reference) {
         try {
-            const response = await fetch('/data/bible.json');
-            const bibleData = await response.json();
+            if (!this.bibleData) {
+                console.log('Loading ASV Bible data from JSON file...');
+                const response = await fetch('/data/asv.json');
+                this.bibleData = await response.json();
+
+                // Validate the loaded data is an array
+                if (!Array.isArray(this.bibleData)) {
+                    throw new Error('Invalid Bible data structure: root must be an array');
+                }
+
+                console.log('Bible data loaded:', {
+                    isArray: Array.isArray(this.bibleData),
+                    length: this.bibleData.length,
+                    sampleVerse: this.bibleData[0]
+                });
+                this.buildBookIndexMap();
+            }
             // Parse reference and fetch from local JSON
-            const verse = this.parseAndFetchFromJSON(bibleData, reference);
+            const verse = this.parseAndFetchFromJSON(reference);
             this.cache.set(reference, verse);
             return verse;
         } catch (error) {
             console.error('Error fetching from local JSON:', error);
-            throw error;
+            throw new Error(`Failed to fetch verse ${reference}: ${error.message}`);
         }
     }
 
-    async fetchFromESVAPI(reference) {
-        // This will be implemented when ESV API key is available
-        throw new Error('ESV API not yet configured');
+    buildBookIndexMap() {
+        // Build index map for efficient book lookup
+        console.log('Building book index map...');
+        const bookNames = new Set();
+
+        // Iterate through the array to find first occurrence of each book
+        for (let i = 0; i < this.bibleData.length; i++) {
+            const verse = this.bibleData[i];
+            if (!verse || !verse.book_name) continue;
+
+            const normalizedName = verse.book_name;
+            if (!bookNames.has(normalizedName)) {
+                this.bookIndexMap.set(normalizedName, i);
+                bookNames.add(normalizedName);
+                console.log('Added book name:', normalizedName, 'at index:', i);
+
+                // Add singular/plural variants
+                if (normalizedName === 'Psalms') {
+                    this.bookNameVariants.set('Psalm', normalizedName);
+                    console.log('Added variant mapping:', 'Psalm', '->', normalizedName);
+                }
+            }
+        }
+        console.log('Available book names:', Array.from(bookNames).sort());
+        console.log('Book name variants:', Object.fromEntries(this.bookNameVariants));
     }
 
-    parseAndFetchFromJSON(bibleData, reference) {
+    normalizeBookName(bookName) {
+        // Check for known variants first
+        console.log('Normalizing book name:', bookName);
+        if (this.bookNameVariants.has(bookName)) {
+            const normalized = this.bookNameVariants.get(bookName);
+            console.log('Found variant mapping:', bookName, '->', normalized);
+            return normalized;
+        }
+        console.log('No variant found, using original:', bookName);
+        return bookName;
+    }
+
+    parseAndFetchFromJSON(reference) {
         // Parse reference format (e.g., "John 3:16")
-        const [book, chapter, verse] = this.parseReference(reference);
+        const [bookName, chapter, verse] = this.parseReference(reference);
+        const normalizedBookName = this.normalizeBookName(bookName);
+        console.log('Looking up verse with normalized book name:', normalizedBookName);
 
-        // Find the verse in the JSON data
-        const verseData = bibleData.verses.find(v =>
-            v.book_name.toLowerCase() === book.toLowerCase() &&
-            v.chapter === parseInt(chapter) &&
-            v.verse === parseInt(verse)
-        );
+        // Validate Bible data
+        if (!Array.isArray(this.bibleData)) {
+            throw new Error('Invalid Bible data structure: data must be an array');
+        }
 
-        if (!verseData) {
-            throw new Error(`Verse ${reference} not found`);
+        // Find the starting index for the book
+        const startIndex = this.bookIndexMap.get(normalizedBookName);
+        if (startIndex === undefined) {
+            throw new Error(`Book ${bookName} not found in Bible data`);
+        }
+
+        // Search for the specific verse
+        let verseObj = null;
+        const targetChapter = parseInt(chapter);
+        const targetVerse = parseInt(verse);
+
+        for (let i = startIndex; i < this.bibleData.length; i++) {
+            const currentVerse = this.bibleData[i];
+
+            // Break if we've moved past the current book
+            if (!currentVerse || currentVerse.book_name !== normalizedBookName) {
+                break;
+            }
+
+            // Check if we've found the matching verse
+            if (parseInt(currentVerse.chapter) === targetChapter &&
+                parseInt(currentVerse.verse) === targetVerse) {
+                verseObj = currentVerse;
+                console.log('Found matching verse:', verseObj);
+                break;
+            }
+        }
+
+        if (!verseObj) {
+            console.log('Failed to find verse:', { book: normalizedBookName, chapter: targetChapter, verse: targetVerse });
+            throw new Error(`Verse ${chapter}:${verse} not found in ${bookName}`);
         }
 
         return {
             reference,
-            text: verseData.text,
-            version: this.isESVEnabled ? 'ESV' : 'ASV'
+            text: verseObj.text,
+            version: this.version
         };
     }
 
     parseReference(reference) {
         // Basic reference parser (e.g., "John 3:16" -> ["John", "3", "16"])
-        const match = reference.match(/^(\d?\s*\w+)\s+(\d+):(\d+)$/);
+        const match = reference.match(/^(\d?\s*[A-Za-z]+(?:\s+[A-Za-z]+)?)\s+(\d+):(\d+)$/);
         if (!match) {
-            throw new Error(`Invalid reference format: ${reference}`);
+            throw new Error(`Invalid reference format: ${reference}. Expected format: "Book Chapter:Verse" (e.g., "John 3:16")`);
         }
-        return [match[1], match[2], match[3]];
+        const bookName = match[1].trim();
+        console.log(`Parsed reference "${reference}" into book: "${bookName}", chapter: ${match[2]}, verse: ${match[3]}`);
+        return [bookName, match[2], match[3]];
     }
 
-    // Method to enable ESV API when key becomes available
-    enableESVAPI(apiKey) {
-        this.apiKey = apiKey;
-        this.isESVEnabled = true;
+    getVersion() {
+        return this.version;
     }
 }
 
