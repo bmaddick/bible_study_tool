@@ -21,10 +21,16 @@ class BibleAPIService {
                 console.log('Loading ASV Bible data from JSON file...');
                 const response = await fetch('/data/asv.json');
                 this.bibleData = await response.json();
+
+                // Validate the loaded data is an array
+                if (!Array.isArray(this.bibleData)) {
+                    throw new Error('Invalid Bible data structure: root must be an array');
+                }
+
                 console.log('Bible data loaded:', {
-                    hasVerses: !!this.bibleData.verses,
-                    versesLength: this.bibleData.verses ? this.bibleData.verses.length : 0,
-                    sampleVerse: this.bibleData.verses ? this.bibleData.verses[0] : null
+                    isArray: Array.isArray(this.bibleData),
+                    length: this.bibleData.length,
+                    sampleVerse: this.bibleData[0]
                 });
                 this.buildBookIndexMap();
             }
@@ -42,21 +48,22 @@ class BibleAPIService {
         // Build index map for efficient book lookup
         console.log('Building book index map...');
         const bookNames = new Set();
-        for (let i = 0; i < this.bibleData.verses.length; i++) {
-            const verse = this.bibleData.verses[i];
-            if (verse.book_name) {
-                const normalizedName = verse.book_name;
+
+        // Iterate through the array to find first occurrence of each book
+        for (let i = 0; i < this.bibleData.length; i++) {
+            const verse = this.bibleData[i];
+            if (!verse || !verse.book_name) continue;
+
+            const normalizedName = verse.book_name;
+            if (!bookNames.has(normalizedName)) {
                 this.bookIndexMap.set(normalizedName, i);
+                bookNames.add(normalizedName);
+                console.log('Added book name:', normalizedName, 'at index:', i);
 
                 // Add singular/plural variants
                 if (normalizedName === 'Psalms') {
                     this.bookNameVariants.set('Psalm', normalizedName);
                     console.log('Added variant mapping:', 'Psalm', '->', normalizedName);
-                }
-                // Add other common variants here if needed
-                if (!bookNames.has(normalizedName)) {
-                    bookNames.add(normalizedName);
-                    console.log('Added book name:', normalizedName);
                 }
             }
         }
@@ -82,9 +89,9 @@ class BibleAPIService {
         const normalizedBookName = this.normalizeBookName(bookName);
         console.log('Looking up verse with normalized book name:', normalizedBookName);
 
-        // Check if verses array exists
-        if (!this.bibleData.verses || !Array.isArray(this.bibleData.verses)) {
-            throw new Error('Invalid Bible data structure: verses must be an array');
+        // Validate Bible data
+        if (!Array.isArray(this.bibleData)) {
+            throw new Error('Invalid Bible data structure: data must be an array');
         }
 
         // Find the starting index for the book
@@ -95,9 +102,9 @@ class BibleAPIService {
 
         // Search for the specific verse
         let verseObj = null;
-        for (let i = startIndex; i < this.bibleData.verses.length; i++) {
-            const currentVerse = this.bibleData.verses[i];
-            if (currentVerse.book_name !== normalizedBookName) break; // Reached next book
+        for (let i = startIndex; i < this.bibleData.length; i++) {
+            const currentVerse = this.bibleData[i];
+            if (!currentVerse || currentVerse.book_name !== normalizedBookName) break; // Reached next book
 
             if (currentVerse.chapter === parseInt(chapter) &&
                 currentVerse.verse === parseInt(verse)) {
