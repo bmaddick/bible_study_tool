@@ -102,18 +102,28 @@ class BibleAPIService {
 
         // Search for the specific verse
         let verseObj = null;
+        const targetChapter = parseInt(chapter);
+        const targetVerse = parseInt(verse);
+
         for (let i = startIndex; i < this.bibleData.length; i++) {
             const currentVerse = this.bibleData[i];
-            if (!currentVerse || currentVerse.book_name !== normalizedBookName) break; // Reached next book
 
-            if (currentVerse.chapter === parseInt(chapter) &&
-                currentVerse.verse === parseInt(verse)) {
+            // Break if we've moved past the current book
+            if (!currentVerse || currentVerse.book_name !== normalizedBookName) {
+                break;
+            }
+
+            // Check if we've found the matching verse
+            if (parseInt(currentVerse.chapter) === targetChapter &&
+                parseInt(currentVerse.verse) === targetVerse) {
                 verseObj = currentVerse;
+                console.log('Found matching verse:', verseObj);
                 break;
             }
         }
 
         if (!verseObj) {
+            console.log('Failed to find verse:', { book: normalizedBookName, chapter: targetChapter, verse: targetVerse });
             throw new Error(`Verse ${chapter}:${verse} not found in ${bookName}`);
         }
 
