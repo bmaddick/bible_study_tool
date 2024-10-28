@@ -6,17 +6,18 @@ export function initializeNavigation() {
         'debate': document.getElementById('debate')
     };
 
-    // Handle hash changes
-    function handleHashChange() {
-        const hash = window.location.hash.slice(1) || '';
+    // Handle both page and hash-based navigation
+    function updateNavigation() {
+        const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+        const currentHash = window.location.hash.slice(1);
 
-        // Hide all sections
+        // Hide all sections first
         Object.values(sections).forEach(section => {
             if (section) section.style.display = 'none';
         });
 
-        // Show the selected section
-        const currentSection = sections[hash];
+        // Show section if hash matches
+        const currentSection = sections[currentHash];
         if (currentSection) {
             currentSection.style.display = 'block';
         }
@@ -24,18 +25,35 @@ export function initializeNavigation() {
         // Update active nav link
         document.querySelectorAll('.nav-link').forEach(link => {
             link.classList.remove('active');
-            if (link.getAttribute('href') === `#${hash}` ||
-                (!hash && link.getAttribute('href') === 'index.html')) {
+            const href = link.getAttribute('href');
+
+            // Check for exact page match
+            if (href === currentPath) {
+                link.classList.add('active');
+            }
+            // Check for hash-based navigation
+            else if (href.startsWith('#') && href === `#${currentHash}`) {
+                link.classList.add('active');
+            }
+            // Special case for home page
+            else if (currentPath === 'index.html' && href === 'index.html') {
+                link.classList.add('active');
+            }
+            // Special case for study page
+            else if (currentPath === 'study.html' && href === 'study.html') {
                 link.classList.add('active');
             }
         });
     }
 
     // Listen for hash changes
-    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('hashchange', updateNavigation);
 
-    // Handle initial load
-    handleHashChange();
+    // Listen for page load
+    window.addEventListener('load', updateNavigation);
+
+    // Handle initial state
+    updateNavigation();
 
     // Initialize AI response handlers
     document.getElementById('ask-faith')?.addEventListener('click', handleFaithQuestion);

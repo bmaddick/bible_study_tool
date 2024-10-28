@@ -70,10 +70,20 @@ export class BibleService {
             const data = await response.json();
             console.log('ASV data loaded, checking structure...');
 
-            // Ensure we're working with an array of verses
-            this.verses = Array.isArray(data) ? data : data.verses;
-            if (!Array.isArray(this.verses)) {
-                throw new Error('Invalid ASV data structure: expected array of verses');
+            // Handle different possible data structures
+            if (Array.isArray(data)) {
+                this.verses = data;
+            } else if (typeof data === 'object' && data !== null) {
+                // Convert object structure to array if needed
+                if (data.verses && Array.isArray(data.verses)) {
+                    this.verses = data.verses;
+                } else {
+                    this.verses = Object.values(data).flat().filter(v => v && typeof v === 'object');
+                }
+            }
+
+            if (!Array.isArray(this.verses) || this.verses.length === 0) {
+                throw new Error('Invalid Bible data structure: could not process verses');
             }
 
             console.log('Building verse index...');
