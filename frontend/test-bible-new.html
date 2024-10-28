@@ -22,17 +22,58 @@
         #result {
             margin-top: 20px;
         }
-        .highlight-toolbar {
-            display: none;
-            position: absolute;
-            background: white;
-            border: 1px solid #ccc;
-            padding: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            z-index: 1000;
+        .ai-response {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        .highlight-toolbar button {
-            margin: 0 4px;
+        .ai-response h3 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        .ai-response pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        .ai-features {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+        }
+        .feature-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+        .feature-section h2 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 1.2em;
+        }
+        .feature-section textarea {
+            width: 100%;
+            min-height: 100px;
+            margin: 10px 0;
+            padding: 8px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        .feature-section button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .feature-section button:hover {
+            background-color: #0056b3;
         }
     </style>
 </head>
@@ -48,31 +89,67 @@
             <button id="searchBtn">Search</button>
         </div>
     </div>
+    <div class="ai-features">
+        <div class="feature-section">
+            <h2>Theological Q&A</h2>
+            <textarea id="theologicalQuestion" placeholder="Ask a theological question..."></textarea>
+            <button id="askTheologyBtn">Ask Question</button>
+        </div>
+        <div class="feature-section">
+            <h2>Debate Simulation</h2>
+            <textarea id="debateQuestion" placeholder="Enter a theological topic for debate..."></textarea>
+            <button id="simulateDebateBtn">Simulate Debate</button>
+        </div>
+        <div class="feature-section">
+            <h2>Christian Apologetics</h2>
+            <textarea id="apologeticsQuestion" placeholder="Ask questions about Christianity..."></textarea>
+            <button id="askApologeticsBtn">Ask Question</button>
+        </div>
+    </div>
+    <div id="testResults" class="test-results" style="margin: 20px 0; padding: 15px; border: 1px solid #4CAF50; border-radius: 4px; background-color: #f8f9fa; display: none;"></div>
     <div id="result"></div>
+    <div id="aiResponse" class="ai-response" style="display: none; margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 4px;"></div>
     <div id="highlightToolbar" class="highlight-toolbar">
-        <button id="highlightBtn">Highlight</button>
-        <button id="meaningBtn">Get Meaning</button>
-        <button id="relatedBtn">Find Related</button>
+        <button id="highlightBtn" class="highlight-btn">Highlight</button>
+        <button id="meaningBtn" class="meaning-btn">Get Meaning</button>
+        <button id="relatedBtn" class="related-btn">Find Related</button>
     </div>
 
     <script type="module">
         import { BibleService } from './js/bibleService.js';
         import { HighlightService } from './js/highlightService.js';
-
+        import { AIService } from './js/aiService.js';
+        import { runVerseLinkingTests } from './js/test-verse-linking.js';
         const bibleService = new BibleService();
         const highlightService = new HighlightService();
+        const aiService = new AIService();
         let servicesInitialized = false;
+        let currentSelection = null;
 
         // Initialize services when the page loads
         (async function initializeServices() {
             try {
                 await bibleService.initialize();
                 highlightService.initialize();
+                aiService.setBibleService(bibleService);
                 servicesInitialized = true;
                 console.log('Services initialized successfully');
                 // Enable buttons after initialization
                 document.getElementById('lookupBtn').disabled = false;
                 document.getElementById('searchBtn').disabled = false;
+                setupHighlightToolbar();
+
+                // Run verse linking tests
+                const testResultsDiv = document.getElementById('testResults');
+                testResultsDiv.style.display = 'block';
+                testResultsDiv.innerHTML = '<p>Running verse linking tests...</p>';
+
+                const testResults = await runVerseLinkingTests(bibleService);
+                testResultsDiv.innerHTML = `
+                    <h3>Verse Linking Test Results:</h3>
+                    <p>${testResults.passed} tests passed, ${testResults.failed} failed</p>
+                    ${testResults.details.map(detail => `<p>${detail}</p>`).join('')}
+                `;
             } catch (error) {
                 console.error('Failed to initialize services:', error);
                 document.getElementById('result').innerHTML = `<p style="color: red">Failed to load Bible data: ${error.message}</p>`;
@@ -87,10 +164,19 @@
             const reference = document.createElement('span');
             reference.className = 'verse-reference';
             reference.textContent = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
+            reference.style.cursor = 'pointer';
+            reference.style.color = '#0066cc';
+            reference.style.textDecoration = 'underline';
+            reference.addEventListener('click', function() {
+                document.getElementById('verseInput').value = div.dataset.reference;
+                lookupVerse();
+                document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+            });
 
             const text = document.createElement('span');
             text.className = 'verse-text';
             text.textContent = verse.text;
+            text.style.userSelect = 'text'; // Make text selectable
 
             div.appendChild(reference);
             div.appendChild(text);
@@ -98,7 +184,7 @@
             // Check if verse is highlighted
             const highlight = highlightService.getHighlight(div.dataset.reference);
             if (highlight) {
-                div.classList.add('highlighted');
+                text.classList.add('highlighted-text');
             }
 
             return div;
@@ -111,10 +197,17 @@
             }
             const reference = document.getElementById('verseInput').value;
             try {
-                const verse = await bibleService.getVerse(reference);
+                const verses = await bibleService.getVerse(reference);
                 const resultDiv = document.getElementById('result');
                 resultDiv.innerHTML = '';
-                resultDiv.appendChild(createVerseElement(verse));
+
+                if (Array.isArray(verses)) {
+                    verses.forEach(verse => {
+                        resultDiv.appendChild(createVerseElement(verse));
+                    });
+                } else {
+                    resultDiv.appendChild(createVerseElement(verses));
+                }
             } catch (error) {
                 document.getElementById('result').innerHTML = `<p style="color: red">${error.message}</p>`;
             }
@@ -144,6 +237,87 @@
             }
         }
 
+        function setupHighlightToolbar() {
+            const toolbar = document.getElementById('highlightToolbar');
+
+            // Make toolbar temporarily visible but transparent for measurements
+            toolbar.style.visibility = 'hidden';
+            toolbar.style.display = 'flex';
+
+            document.addEventListener('mouseup', function(e) {
+                const selection = window.getSelection();
+                if (selection && selection.toString().length > 0) {
+                    // Check if selection is within a verse-text element
+                    const range = selection.getRangeAt(0);
+                    const verseText = range.startContainer.closest('.verse-text');
+
+                    if (verseText) {
+                        currentSelection = selection;
+                        const rect = range.getBoundingClientRect();
+                        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                        const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+
+                        // Position toolbar above the selection
+                        toolbar.style.visibility = 'visible';
+                        toolbar.style.top = `${rect.top + scrollTop - toolbar.offsetHeight - 10}px`;
+                        toolbar.style.left = `${rect.left + (rect.width / 2) - (toolbar.offsetWidth / 2) + scrollLeft}px`;
+                    }
+                } else {
+                    toolbar.style.visibility = 'hidden';
+                    currentSelection = null;
+                }
+            });
+
+            document.getElementById('highlightBtn').addEventListener('click', function() {
+                if (currentSelection) {
+                    const range = currentSelection.getRangeAt(0);
+                    const span = document.createElement('span');
+                    span.className = 'highlighted-text';
+                    range.surroundContents(span);
+
+                    const verseElement = range.startContainer.closest('.verse');
+                    if (verseElement) {
+                        highlightService.addHighlight(verseElement.dataset.reference, {
+                            text: currentSelection.toString(),
+                            startOffset: range.startOffset,
+                            endOffset: range.endOffset
+                        });
+                    }
+
+                    toolbar.style.visibility = 'hidden';
+                    currentSelection = null;
+                }
+            });
+
+            document.getElementById('meaningBtn').addEventListener('click', async function() {
+                if (currentSelection) {
+                    const verseElement = currentSelection.getRangeAt(0).startContainer.closest('.verse');
+                    if (verseElement) {
+                        const reference = verseElement.dataset.reference;
+                        const selectedText = currentSelection.toString();
+                        const response = await aiService.getVerseInterpretation(selectedText, reference);
+                        displayAIResponse(response);
+                    }
+                    toolbar.style.visibility = 'hidden';
+                    currentSelection = null;
+                }
+            });
+
+            document.getElementById('relatedBtn').addEventListener('click', async function() {
+                if (currentSelection) {
+                    const verseElement = currentSelection.getRangeAt(0).startContainer.closest('.verse');
+                    if (verseElement) {
+                        const reference = verseElement.dataset.reference;
+                        const selectedText = currentSelection.toString();
+                        const response = await aiService.findRelatedVerses(selectedText, reference);
+                        displayAIResponse(response);
+                    }
+                    toolbar.style.visibility = 'hidden';
+                    currentSelection = null;
+                }
+            });
+        }
+
         // Disable buttons until initialization is complete
         document.getElementById('lookupBtn').disabled = true;
         document.getElementById('searchBtn').disabled = true;
@@ -159,6 +333,120 @@
         document.getElementById('searchInput').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') searchVerses();
         });
+
+        // Add event listeners for AI features
+        document.getElementById('askTheologyBtn').addEventListener('click', async () => {
+            const question = document.getElementById('theologicalQuestion').value;
+            if (question.trim()) {
+                const response = await aiService.getTheologicalAnswer(question);
+                displayAIResponse(response);
+            }
+        });
+
+        document.getElementById('simulateDebateBtn').addEventListener('click', async () => {
+            const topic = document.getElementById('debateQuestion').value;
+            if (topic.trim()) {
+                const response = await aiService.simulateDebate(topic);
+                displayAIResponse(response);
+            }
+        });
+
+        document.getElementById('askApologeticsBtn').addEventListener('click', async () => {
+            const question = document.getElementById('apologeticsQuestion').value;
+            if (question.trim()) {
+                const response = await aiService.getApologeticsResponse(question);
+                displayAIResponse(response);
+            }
+        });
+
+        function displayAIResponse(response) {
+            const aiResponseDiv = document.getElementById('aiResponse');
+            aiResponseDiv.style.display = 'block';
+            let html = '';
+
+            if (response.title) {
+                html += '<h3>' + response.title + '</h3>';
+            }
+
+            // Handle verse interpretation
+            if (response.interpretation) {
+                html += '<p><strong>Interpretation:</strong> ' + response.interpretation + '</p>';
+            }
+
+            // Handle theological Q&A
+            if (response.answer) {
+                html += '<p><strong>Answer:</strong> ' + response.answer + '</p>';
+                if (response.denominationalViews) {
+                    html += '<div class="denominational-views">';
+                    html += '<p><strong>Denominational Perspectives:</strong></p>';
+                    html += '<ul>';
+                    for (const [denomination, view] of Object.entries(response.denominationalViews)) {
+                        html += `<li><strong>${denomination}:</strong> ${view}</li>`;
+                    }
+                    html += '</ul></div>';
+                }
+            }
+
+            // Handle debate simulation
+            if (response.viewA && response.viewB) {
+                html += '<div class="debate-simulation">';
+                html += '<h4>Debate Perspectives:</h4>';
+                html += '<div class="view-a">';
+                html += `<p><strong>Position A:</strong> ${response.viewA.position}</p>`;
+                html += '<ul>';
+                response.viewA.arguments.forEach(arg => html += `<li>${arg}</li>`);
+                html += '</ul></div>';
+                html += '<div class="view-b">';
+                html += `<p><strong>Position B:</strong> ${response.viewB.position}</p>`;
+                html += '<ul>';
+                response.viewB.arguments.forEach(arg => html += `<li>${arg}</li>`);
+                html += '</ul></div>';
+                if (response.synthesis) {
+                    html += `<p><strong>Synthesis:</strong> ${response.synthesis}</p>`;
+                }
+                html += '</div>';
+            }
+
+            // Handle apologetics response
+            if (response.philosophicalArguments) {
+                html += '<div class="apologetics-response">';
+                html += '<p><strong>Arguments:</strong></p><ul>';
+                response.philosophicalArguments.forEach(arg => html += `<li>${arg}</li>`);
+                html += '</ul>';
+                if (response.historicalContext) {
+                    html += `<p><strong>Historical Context:</strong> ${response.historicalContext}</p>`;
+                }
+                html += '</div>';
+            }
+
+            // Handle related verses for any response type
+            if (response.scriptureReferences && response.scriptureReferences.length > 0) {
+                html += '<p><strong>Scripture References:</strong></p><ul class="verse-list">';
+                response.scriptureReferences.forEach(ref => {
+                    const reference = ref.split(' - ')[0]; // Extract only the reference part before the hyphen
+                    html += `<li><a href="#" class="verse-link" data-reference="${reference}">${ref}</a></li>`;
+                });
+                html += '</ul>';
+            }
+
+            if (response.notes) {
+                html += '<p><strong>Additional Notes:</strong> ' + response.notes + '</p>';
+            }
+
+            aiResponseDiv.innerHTML = html;
+            // Add click handlers for verse links
+            aiResponseDiv.querySelectorAll('.verse-link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const reference = this.dataset.reference;
+                    document.getElementById('verseInput').value = reference;
+                    lookupVerse();
+                    document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+                });
+            });
+            // Scroll to response
+            aiResponseDiv.scrollIntoView({ behavior: 'smooth' });
+        }
     </script>
 </body>
 </html>

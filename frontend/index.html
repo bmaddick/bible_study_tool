@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bible Study Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@chakra-ui/css/reset@2.3.1/dist/reset.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
     <nav class="main-nav">
         <div class="nav-container">
-            <a href="index.html" class="nav-link">Home</a>
+            <a href="index.html" class="nav-link active">Home</a>
             <a href="study.html" class="nav-link">Study Bible</a>
-            <a href="questioning.html" class="nav-link">Questioning?</a>
-            <a href="theological.html" class="nav-link">Theological questions</a>
-            <a href="debate.html" class="nav-link">Theological debate</a>
+            <a href="#questioning" class="nav-link">Questioning?</a>
+            <a href="#theological" class="nav-link">Theological questions</a>
+            <a href="#debate" class="nav-link">Theological debate</a>
             <a href="contact.html" class="nav-link">Contact</a>
         </div>
     </nav>
@@ -58,6 +59,33 @@
         </section>
 
         <!-- Hidden sections for functionality -->
+        <section id="questioning" class="content-section">
+            <h2>Questioning Faith</h2>
+            <div class="input-container">
+                <textarea id="faith-question" placeholder="Ask your questions about faith..." rows="4"></textarea>
+                <button id="ask-faith" class="submit-button">Ask Question</button>
+            </div>
+            <div id="faith-response" class="ai-response-container"></div>
+        </section>
+
+        <section id="theological" class="content-section">
+            <h2>Theological Questions</h2>
+            <div class="input-container">
+                <textarea id="theological-question" placeholder="Ask deeper theological questions..." rows="4"></textarea>
+                <button id="ask-theological" class="submit-button">Ask Question</button>
+            </div>
+            <div id="theological-response" class="ai-response-container"></div>
+        </section>
+
+        <section id="debate" class="content-section">
+            <h2>Theological Debate</h2>
+            <div class="input-container">
+                <textarea id="debate-topic" placeholder="Enter a theological topic for debate..." rows="4"></textarea>
+                <button id="start-debate" class="submit-button">Start Debate</button>
+            </div>
+            <div id="debate-response" class="ai-response-container"></div>
+        </section>
+
         <div id="functionality-sections" style="display: none;">
             <div class="bible-content">
                 <div class="verse-container"></div>
@@ -70,6 +98,7 @@
         </div>
     </main>
 
+    <script src="js/navigation.js" type="module"></script>
     <script src="js/app.js" type="module"></script>
     <script src="js/bibleService.js" type="module"></script>
     <script src="js/aiService.js" type="module"></script>
