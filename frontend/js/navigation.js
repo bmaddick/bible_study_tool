@@ -23,25 +23,23 @@ export function initializeNavigation() {
         }
 
         // Update active nav link
-        document.querySelectorAll('.nav-link').forEach(link => {
+        document.querySelectorAll('nav a').forEach(link => {
             link.classList.remove('active');
             const href = link.getAttribute('href');
 
-            // Check for exact page match
-            if (href === currentPath) {
-                link.classList.add('active');
+            // Handle main navigation (index.html and study.html)
+            if (!href.includes('#')) {
+                const linkPath = href || 'index.html';
+                if (linkPath === currentPath) {
+                    link.classList.add('active');
+                }
             }
-            // Check for hash-based navigation
-            else if (href.startsWith('#') && href === `#${currentHash}`) {
-                link.classList.add('active');
-            }
-            // Special case for home page
-            else if (currentPath === 'index.html' && href === 'index.html') {
-                link.classList.add('active');
-            }
-            // Special case for study page
-            else if (currentPath === 'study.html' && href === 'study.html') {
-                link.classList.add('active');
+            // Handle hash-based navigation
+            else {
+                const [linkPath, linkHash] = href.split('#');
+                if (linkPath === currentPath && linkHash === currentHash) {
+                    link.classList.add('active');
+                }
             }
         });
     }
