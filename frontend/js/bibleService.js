@@ -7,13 +7,62 @@ export class BibleService {
         this.initializationError = null;
     }
 
+    // Parse reference into standardized format and handle verse ranges
+    parseReference(reference) {
+        console.log(`Parsing reference: ${reference}`);
+        // Remove any text after hyphen and trim
+        reference = reference.split(' - ')[0].trim();
+
+        // Convert numeric prefixes to written form
+        reference = reference.replace(/^(\d+)\s+/, (match, num) => {
+            const numbers = ['First', 'Second', 'Third'];
+            return `${numbers[parseInt(num) - 1] || num} `;
+        });
+
+        // Match patterns for different formats
+        const patterns = [
+            /^((?:First|Second|Third|[123])\s+)?([A-Za-z]+)\s+(\d+):(\d+)(?:-(\d+))?$/,
+            /^([A-Za-z]+)\s+(\d+):(\d+)(?:-(\d+))?$/
+        ];
+
+        let match = null;
+        for (const pattern of patterns) {
+            match = reference.match(pattern);
+            if (match) break;
+        }
+
+        if (!match) {
+            console.warn(`Invalid reference format: ${reference}`);
+            throw new Error(`Invalid reference format: ${reference}`);
+        }
+
+        // Extract components based on match pattern
+        const [_, prefix, bookName, chapter, startVerse, endVerse] = match;
+        const book = prefix ? `${prefix}${bookName}` : bookName;
+        const start = parseInt(startVerse);
+        const end = endVerse ? parseInt(endVerse) : start;
+
+        const references = [];
+        for (let verse = start; verse <= end; verse++) {
+            references.push({
+                book,
+                chapter: parseInt(chapter),
+                verse,
+                reference: `${book} ${chapter}:${verse}`
+            });
+        }
+
+        console.log(`Parsed references:`, references);
+        return references;
+    }
+
     async initialize() {
         if (this.initialized) return;
         if (this.initializationError) throw this.initializationError;
 
         try {
             console.log('Initializing Bible Service...');
-            const response = await fetch('./data/asv.json');
+            const response = await fetch('../data/asv.json');
             if (!response.ok) {
                 throw new Error(`Failed to fetch ASV data: ${response.status} ${response.statusText}`);
             }
@@ -21,34 +70,21 @@ export class BibleService {
             const data = await response.json();
             console.log('ASV data loaded, checking structure...');
 
-            // Handle both possible JSON structures
-            if (data.verses) {
-                this.verses = data.verses;
-            } else if (Array.isArray(data)) {
-                this.verses = data;
-            } else {
-                throw new Error('Invalid ASV data structure: expected verses property or array');
+            // Ensure we're working with an array of verses
+            this.verses = Array.isArray(data) ? data : data.verses;
+            if (!Array.isArray(this.verses)) {
+                throw new Error('Invalid ASV data structure: expected array of verses');
             }
 
-            console.log('Verses accessed, building index...');
-            console.log('First verse structure:', this.verses[Object.keys(this.verses)[0]]);
-
-            // Build verse index for efficient lookup
-            let verseCount = 0;
-            for (const [key, verse] of Object.entries(this.verses)) {
-                if (verse && verse.book_name && verse.chapter && verse.verse) {
-                    const reference = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
-                    this.verseIndex.set(reference, verse);
-                    verseCount++;
-                    if (verseCount % 5000 === 0) {
-                        console.log(`Indexed ${verseCount} verses...`);
-                    }
-                }
-            }
+            console.log('Building verse index...');
+            await this.buildVerseIndex();
 
             this.initialized = true;
-            console.log(`Bible Service initialized successfully with ${verseCount} verses indexed`);
-            console.log('Sample verse keys:', Array.from(this.verseIndex.keys()).slice(0, 3));
+            console.log(`Bible Service initialized with ${this.verseIndex.size} verses indexed`);
+            this.logSampleVerses();
+
+            // Expose service instance globally for testing
+            window.bibleService = this;
         } catch (error) {
             this.initializationError = error;
             console.error('Error initializing Bible Service:', error);
@@ -56,19 +92,109 @@ export class BibleService {
         }
     }
 
+    async buildVerseIndex() {
+        const normalizeBookName = (name) => {
+            return name
+                .replace(/^(\d+)\s+/, (match, num) => {
+                    const numbers = ['First', 'Second', 'Third'];
+                    return `${numbers[parseInt(num) - 1] || num} `;
+                })
+                .replace(/\s+/g, ' ')
+                .trim();
+        };
+
+        for (const verse of this.verses) {
+            if (!verse || !verse.book_name || !verse.chapter || !verse.verse) continue;
+
+            // Create reference variations
+            const bookVariations = [
+                verse.book_name,                                           // Original
+                normalizeBookName(verse.book_name),                       // Normalized
+                verse.book_name.replace(/^(\d+)/, '$1st'),               // 1st format
+                verse.book_name.toLowerCase(),                            // Lowercase
+                normalizeBookName(verse.book_name).toLowerCase()          // Normalized lowercase
+            ];
+
+            const verseRef = `${verse.chapter}:${verse.verse}`;
+            const uniqueVariations = [...new Set(bookVariations)];
+
+            // Index all variations
+            for (const bookName of uniqueVariations) {
+                const reference = `${bookName} ${verseRef}`;
+                this.verseIndex.set(reference, verse);
+            }
+        }
+    }
+
+    logSampleVerses() {
+        const samples = Array.from(this.verseIndex.keys()).slice(0, 5);
+        console.log('Sample indexed verses:', samples);
+        for (const sample of samples) {
+            console.log(`${sample}:`, this.verseIndex.get(sample).text);
+        }
+    }
+
     async getVerse(reference) {
         await this.initialize();
         console.log(`Looking up verse: ${reference}`);
 
-        const verse = this.verseIndex.get(reference);
-        if (verse) {
-            console.log(`Found verse: ${reference}`, verse);
-            return verse;
-        }
+        try {
+            const parsedRefs = this.parseReference(reference);
+            console.log(`Parsed ${parsedRefs.length} references for range: ${reference}`);
+            const verses = [];
 
-        console.warn(`Verse not found: ${reference}`);
-        console.log('Available references:', Array.from(this.verseIndex.keys()).slice(0, 5));
-        throw new Error(`Verse not found: ${reference}`);
+            for (const ref of parsedRefs) {
+                console.log(`Processing reference: ${ref.reference}`);
+                // Try exact match first
+                let verse = this.verseIndex.get(ref.reference);
+
+                // Try alternate formats if exact match fails
+                if (!verse) {
+                    const normalizedRef = `${ref.book} ${ref.chapter}:${ref.verse}`;
+                    console.log(`Trying normalized reference: ${normalizedRef}`);
+                    verse = this.verseIndex.get(normalizedRef) ||
+                           this.findVerseByFuzzyMatch(normalizedRef);
+                }
+
+                if (!verse) {
+                    console.warn(`Verse not found: ${ref.reference}`);
+                    this.logAvailableReferences();
+                    throw new Error(`Verse not found: ${ref.reference}`);
+                }
+
+                console.log(`Found verse: ${ref.reference}`);
+                verses.push({
+                    ...verse,
+                    reference: ref.reference
+                });
+            }
+
+            // Always return array for verse ranges, single object for single verses
+            const result = verses.length === 1 ? verses[0] : verses;
+            console.log(`Returning ${verses.length} verse(s) for reference: ${reference}`);
+            return result;
+        } catch (error) {
+            console.warn('Verse lookup error:', error.message);
+            throw error;
+        }
+    }
+
+    findVerseByFuzzyMatch(reference) {
+        const [bookName, verseRef] = reference.split(/\s+(?=\d+:)/);
+        const normalizedSearch = bookName.toLowerCase();
+
+        // Try fuzzy matching
+        for (const [key, verse] of this.verseIndex.entries()) {
+            if (key.toLowerCase().includes(normalizedSearch) && key.endsWith(verseRef)) {
+                return verse;
+            }
+        }
+        return null;
+    }
+
+    logAvailableReferences() {
+        const refs = Array.from(this.verseIndex.keys()).slice(0, 5);
+        console.log('Available references:', refs);
     }
 
     async searchVerses(query) {
@@ -85,9 +211,6 @@ export class BibleService {
         }
 
         console.log(`Found ${results.length} verses matching "${query}"`);
-        if (results.length > 0) {
-            console.log('First match:', results[0]);
-        }
         return results;
     }
 
@@ -95,23 +218,55 @@ export class BibleService {
         await this.initialize();
         console.log(`Getting chapter: ${book} ${chapter}`);
 
-        const results = Array.from(this.verseIndex.values()).filter(verse =>
-            verse.book_name === book && verse.chapter === parseInt(chapter)
-        );
+        const results = Array.from(this.verseIndex.values())
+            .filter(verse => verse.book_name === book && verse.chapter === parseInt(chapter))
+            .sort((a, b) => a.verse - b.verse);
 
         console.log(`Found ${results.length} verses in ${book} ${chapter}`);
-        if (results.length > 0) {
-            console.log('First verse:', results[0]);
-        }
         return results;
     }
 
-    // Helper method to get all available books
     async getBooks() {
         await this.initialize();
         const books = new Set(Array.from(this.verseIndex.values()).map(verse => verse.book_name));
-        const bookList = Array.from(books).sort();
-        console.log('Available books:', bookList);
-        return bookList;
+        return Array.from(books).sort();
+    }
+
+    async findRelatedVerses(reference) {
+        await this.initialize();
+        console.log(`Finding related verses for: ${reference}`);
+
+        const sourceVerse = await this.getVerse(reference);
+        if (!sourceVerse) {
+            throw new Error(`Source verse not found: ${reference}`);
+        }
+
+        const keywords = sourceVerse.text.toLowerCase()
+            .replace(/[.,;:!?]/g, '')
+            .split(' ')
+            .filter(word => word.length > 4);
+
+        const results = [];
+        for (const verse of this.verseIndex.values()) {
+            if (verse.book_name === sourceVerse.book_name &&
+                verse.chapter === sourceVerse.chapter &&
+                verse.verse === sourceVerse.verse) {
+                continue;
+            }
+
+            const verseText = verse.text.toLowerCase();
+            const matchCount = keywords.filter(keyword => verseText.includes(keyword)).length;
+
+            if (matchCount >= 2) {
+                results.push({
+                    verse,
+                    relevance: matchCount,
+                    reference: `${verse.book_name} ${verse.chapter}:${verse.verse}`
+                });
+            }
+        }
+
+        results.sort((a, b) => b.relevance - a.relevance);
+        return results.slice(0, 5);
     }
 }
