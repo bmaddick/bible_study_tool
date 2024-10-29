@@ -28,12 +28,13 @@ body {
 }
 
 .nav-container {
-    max-width: 1400px;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 1rem 2rem;
     display: flex;
     gap: 2rem;
     align-items: center;
+    justify-content: center;
 }
 
 .nav-link {
@@ -270,7 +271,113 @@ body {
         gap: 1.5rem;
     }
 
-    .analysis-container section {
         padding: 1rem;
+    }
+}
+
+/* Home Page Styles */
+.content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.content h1 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.scripture-quote {
+    font-size: 1.25rem;
+    color: var(--secondary-color);
+    margin: 2rem 0;
+    font-style: italic;
+    line-height: 1.6;
+}
+
+.getting-started {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.getting-started h2 {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.welcome {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    color: var(--secondary-color);
+}
+
+.steps {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.steps li {
+    background: var(--background-color);
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border: 1px solid #E2E8F0;
+    transition: transform 0.2s ease;
+}
+
+.steps h3 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.steps p {
+    color: var(--secondary-color);
+    line-height: 1.6;
+}
+
+.encouragement {
+    font-size: 1.1rem;
+    margin: 2rem 0;
+    color: var(--secondary-color);
+}
+
+.note {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    font-style: italic;
+}
+
+/* Responsive adjustments for home page */
+@media (max-width: 768px) {
+    .content {
+        padding: 1rem;
+    }
+
+    .content h1 {
+        font-size: 2rem;
+    }
+
+    .scripture-quote {
+        font-size: 1.1rem;
+    }
+
+    .steps {
+        gap: 1.5rem;
+    }
+
+    .steps li {
+        padding: 1.5rem;
     }
 }
