@@ -73,15 +73,18 @@ class VerseLinkingService {
 
     async updateRelatedVerses() {
         const relatedVersesContainer = document.querySelector('.related-verses-content');
-        if (!relatedVersesContainer || this.selectedVerses.size === 0) {
+        if (!relatedVersesContainer) return;
+
+        // Clear existing content immediately
+        relatedVersesContainer.innerHTML = '';
+
+        // Show empty state if no verses are selected
+        if (this.selectedVerses.size === 0) {
             relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see related verses</p>';
             return;
         }
 
         const relatedVerses = await this.getRelatedVerses(Array.from(this.selectedVerses));
-
-        // Clear existing content
-        relatedVersesContainer.innerHTML = '';
 
         // Add related verses
         for (const verse of relatedVerses) {
