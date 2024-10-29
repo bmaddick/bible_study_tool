@@ -1,19 +1,69 @@
+import { config } from './config.js';
+
 class AIService {
     constructor() {
         this.context = [];
         this.bibleService = null;
+        this.baseUrl = 'https://api.openai.com/v1/chat/completions';
     }
 
     setBibleService(bibleService) {
         this.bibleService = bibleService;
     }
 
+    async getGPTResponse(prompt, systemRole = 'You are a biblical scholar with expertise in historical context, theology, and interpretation.') {
+        const response = await fetch(this.baseUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${config.openai.apiKey}`
+            },
+            body: JSON.stringify({
+                model: config.openai.model,
+                messages: [
+                    {
+                        role: 'system',
+                        content: systemRole
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                temperature: 0.7,
+                max_tokens: 500
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to get AI response');
+        }
+
+        const data = await response.json();
+        return data.choices[0].message.content;
+    }
+
+    async getHistoricalContext(verseText, reference) {
+        const prompt = `Provide detailed historical context for this Bible verse:\nReference: ${reference}\nVerse: ${verseText}\n\nInclude:\n1. Historical setting\n2. Cultural background\n3. Original audience\n4. Relevant historical events`;
+        return this.getGPTResponse(prompt);
+    }
+
+    async getTheologicalInsights(verseText, reference) {
+        const prompt = `Provide theological insights for this Bible verse:\nReference: ${reference}\nVerse: ${verseText}\n\nInclude:\n1. Key theological themes\n2. Doctrinal significance\n3. Connection to broader biblical narrative\n4. Application principles`;
+        return this.getGPTResponse(prompt);
+    }
+
     async getVerseInterpretation(verseText, reference) {
-        // Simulate AI response for verse interpretation
+        const [historicalContext, theologicalInsights] = await Promise.all([
+            this.getHistoricalContext(verseText, reference),
+            this.getTheologicalInsights(verseText, reference)
+        ]);
+
         return {
-            meaning: `Analysis of ${reference}: ${verseText}\n\nThis verse is commonly interpreted as...`,
-            translationNotes: "Key translation considerations...",
-            relatedVerses: ["John 1:1", "Genesis 1:2"]
+            meaning: theologicalInsights,
+            historicalContext: historicalContext,
+            translationNotes: await this.getTranslationNotes(verseText, reference),
+            relatedVerses: await this.findRelatedVerses(reference)
         };
     }
 
@@ -36,78 +86,70 @@ class AIService {
     }
 
     async simulateDebate(topic) {
-        // Simulate a theological debate between two perspectives
-        let viewA, viewB;
+        const prompt = `Generate a balanced theological debate on the topic: "${topic}"\n\nProvide:\n1. Two contrasting viewpoints\n2. Biblical arguments for each view\n3. Relevant scripture references\n4. A balanced synthesis`;
+        const debateContent = await this.getGPTResponse(prompt);
 
-        // Generate viewpoints based on the topic
-        if (topic.toLowerCase().includes('sabbath')) {
-            viewA = "Saturday Sabbath Observance";
-            viewB = "Sunday Sabbath Observance";
-        } else {
-            viewA = "Traditional View";
-            viewB = "Alternative View";
+        try {
+            const parsedContent = JSON.parse(debateContent);
+            return parsedContent;
+        } catch (error) {
+            return {
+                topic,
+                viewA: {
+                    position: "Traditional View",
+                    arguments: debateContent.split('\n').slice(0, 2),
+                    scriptureReferences: []
+                },
+                viewB: {
+                    position: "Alternative View",
+                    arguments: debateContent.split('\n').slice(2, 4),
+                    scriptureReferences: []
+                },
+                synthesis: debateContent.split('\n').pop()
+            };
         }
-
-        return {
-            topic,
-            viewA: {
-                position: viewA,
-                arguments: [
-                    "The seventh day was sanctified from creation",
-                    "The Fourth Commandment specifically mentions the seventh day"
-                ],
-                scriptureReferences: ["Genesis 2:2-3", "Exodus 20:8-11"]
-            },
-            viewB: {
-                position: viewB,
-                arguments: [
-                    "Early Christians gathered on Sunday to commemorate the resurrection",
-                    "The Lord's Day represents the new covenant"
-                ],
-                scriptureReferences: ["Acts 20:7", "Revelation 1:10"]
-            },
-            synthesis: "While Christians differ on the specific day of observance, the principle of regular worship and rest remains central to Christian practice."
-        };
     }
 
     async getApologeticsResponse(question) {
-        // Simulate apologetics responses
-        return {
-            answer: "Christianity's unique claims center on the historical resurrection of Jesus Christ, documented by multiple eyewitnesses, and its coherent worldview that explains humanity's condition and offers hope through verifiable historical events rather than merely philosophical concepts.",
-            scriptureReferences: [
-                "1 Corinthians 15:3-8 - Historical evidence of resurrection appearances",
-                "Acts 17:31 - Historical proof through resurrection",
-                "John 1:1-14 - Philosophical foundation of the Logos",
-                "Romans 1:19-20 - Natural revelation and reason"
-            ],
-            historicalContext: "Christianity emerged in a specific historical context with multiple contemporary accounts, archaeological evidence, and rapid spread despite persecution. The New Testament documents were written within the lifetime of eyewitnesses who could verify or dispute the claims.",
-            philosophicalArguments: [
-                "The Moral Argument: Objective moral values and duties point to a transcendent moral lawgiver",
-                "The Cosmological Argument: The universe's beginning suggests a transcendent cause",
-                "The Historical Argument: The resurrection is the best explanation for the historical data",
-                "The Existential Argument: Christianity best explains human nature, consciousness, and purpose"
-            ]
-        };
+        const prompt = `Provide a comprehensive apologetics response to this question: "${question}"\n\nInclude:\n1. Main argument\n2. Biblical support\n3. Historical evidence\n4. Philosophical reasoning\n5. Common objections and responses`;
+        const response = await this.getGPTResponse(prompt);
+
+        try {
+            const parsedResponse = JSON.parse(response);
+            return parsedResponse;
+        } catch (error) {
+            return {
+                answer: response,
+                scriptureReferences: [],
+                historicalContext: "",
+                philosophicalArguments: []
+            };
+        }
     }
 
     async getTheologicalAnswer(question) {
-        // Simulate theological Q&A
-        const faithAndSalvationVerses = [
-            "Ephesians 2:8-9 - For by grace are ye saved through faith; and that not of yourselves: it is the gift of God",
-            "Romans 10:9-10 - That if thou shalt confess with thy mouth the Lord Jesus, and shalt believe in thine heart",
-            "John 3:16 - For God so loved the world, that he gave his only begotten Son",
-            "Acts 16:31 - Believe on the Lord Jesus Christ, and thou shalt be saved"
-        ];
+        const prompt = `Answer this theological question: "${question}"\n\nProvide:\n1. Biblical explanation\n2. Key scripture references\n3. Different denominational perspectives\n4. Practical application`;
+        const response = await this.getGPTResponse(prompt);
 
-        return {
-            answer: "Salvation through faith is a central doctrine of Christianity. It teaches that we are saved by God's grace through faith in Jesus Christ, not by our own works. This faith involves believing in Jesus's death and resurrection for our sins, and accepting Him as Lord and Savior.",
-            scriptureReferences: faithAndSalvationVerses,
-            denominationalViews: {
-                catholic: "Emphasizes faith working through love and sacramental grace",
-                protestant: "Stresses salvation by faith alone (sola fide)",
-                orthodox: "Views salvation as theosis - union with God through faith"
-            }
-        };
+        try {
+            const parsedResponse = JSON.parse(response);
+            return parsedResponse;
+        } catch (error) {
+            return {
+                answer: response,
+                scriptureReferences: [],
+                denominationalViews: {
+                    catholic: "",
+                    protestant: "",
+                    orthodox: ""
+                }
+            };
+        }
+    }
+
+    async getTranslationNotes(verseText, reference) {
+        const prompt = `Provide translation notes for this Bible verse:\nReference: ${reference}\nVerse: ${verseText}\n\nInclude:\n1. Key terms in original languages\n2. Alternative translations\n3. Textual variants if any`;
+        return this.getGPTResponse(prompt);
     }
 }
 
