@@ -48,11 +48,28 @@ class VerseLinkingService {
         const prevButton = document.getElementById('prev-chapter');
         const nextButton = document.getElementById('next-chapter');
 
+        // Ensure navigation methods are bound to this instance
+        const boundNavigatePrev = () => {
+            if (typeof this.navigateChapter === 'function') {
+                this.navigateChapter('prev');
+            } else {
+                console.error('Navigation method not properly initialized');
+            }
+        };
+
+        const boundNavigateNext = () => {
+            if (typeof this.navigateChapter === 'function') {
+                this.navigateChapter('next');
+            } else {
+                console.error('Navigation method not properly initialized');
+            }
+        };
+
         if (prevButton) {
-            prevButton.addEventListener('click', () => this.navigateChapter('prev'));
+            prevButton.addEventListener('click', boundNavigatePrev);
         }
         if (nextButton) {
-            nextButton.addEventListener('click', () => this.navigateChapter('next'));
+            nextButton.addEventListener('click', boundNavigateNext);
         }
     }
 
