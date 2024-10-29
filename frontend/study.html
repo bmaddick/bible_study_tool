@@ -22,11 +22,19 @@
 
     <main class="content">
         <div class="bible-content">
-            <div class="verse-container"></div>
+            <div class="verse-container">
+                <div class="verse">
+                    <div class="verse-header">
+                        <span class="verse-reference"></span>
+                        <span class="verse-version">ASV</span>
+                    </div>
+                    <div class="verse-text"></div>
+                </div>
+            </div>
         </div>
         <div class="search-container">
             <input type="text" id="verse-search" placeholder="Enter verse reference (e.g., John 3:16)" aria-label="Verse reference search">
-            <button id="search-button" aria-label="Search for verse">Search</button>
+            <button id="search-button" class="search-btn" aria-label="Search for verse">Search</button>
         </div>
         <div id="aiResponse" class="ai-response-container"></div>
     </main>
