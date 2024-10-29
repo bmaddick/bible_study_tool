@@ -1,8 +1,9 @@
 // verseLinking.js - Handles verse selection and related verse display functionality
 
 class VerseLinkingService {
-    constructor(bibleService) {
+    constructor(bibleService, aiService) {
         this.bibleService = bibleService;
+        this.aiService = aiService;
         this.selectedVerses = new Set();
         this.currentChapter = null;
         this.currentBook = null;
@@ -58,35 +59,59 @@ class VerseLinkingService {
     async handleVerseClick(verseElement) {
         const verseNumber = verseElement.dataset.verseNumber;
         const verseReference = `${this.currentBook} ${this.currentChapter}:${verseNumber}`;
+        const verseText = await this.bibleService.getVerse(verseReference);
 
         // Toggle verse selection
         if (this.selectedVerses.has(verseReference)) {
             this.selectedVerses.delete(verseReference);
             verseElement.classList.remove('selected');
+            // Clear AI analysis sections
+            this.clearAnalysisSections();
         } else {
             this.selectedVerses.add(verseReference);
             verseElement.classList.add('selected');
+            // Show loading state
+            this.showLoadingState();
+            // Update AI analysis sections
+            await Promise.all([
+                this.updateRelatedVerses(),
+                this.updateHistoricalContext(verseText),
+                this.updateTheologicalInsights(verseText)
+            ]);
         }
-
-        await this.updateRelatedVerses();
     }
 
     async updateRelatedVerses() {
         const relatedVersesContainer = document.querySelector('.related-verses-content');
-        if (!relatedVersesContainer) return;
+        const historicalContainer = document.querySelector('.historical-context-content');
+        const theologicalContainer = document.querySelector('.theological-insights-content');
+
+        if (!relatedVersesContainer || !historicalContainer || !theologicalContainer) return;
 
         // Clear existing content immediately
         relatedVersesContainer.innerHTML = '';
+        historicalContainer.innerHTML = '';
+        theologicalContainer.innerHTML = '';
 
         // Show empty state if no verses are selected
         if (this.selectedVerses.size === 0) {
-            relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see related verses</p>';
+            const emptyState = '<p class="empty-state">Select a verse number to see content</p>';
+            relatedVersesContainer.innerHTML = emptyState;
+            historicalContainer.innerHTML = emptyState;
+            theologicalContainer.innerHTML = emptyState;
             return;
         }
 
+        // Show loading states
+        const loadingState = '<p class="loading-state">Loading...</p>';
+        relatedVersesContainer.innerHTML = loadingState;
+        historicalContainer.innerHTML = loadingState;
+        theologicalContainer.innerHTML = loadingState;
+
         const relatedVerses = await this.getRelatedVerses(Array.from(this.selectedVerses));
 
-        // Add related verses
+        // Clear loading state and add related verses
+        relatedVersesContainer.innerHTML = '';
         for (const verse of relatedVerses) {
             const verseElement = document.createElement('div');
             verseElement.classList.add('related-verse');
@@ -208,6 +233,58 @@ class VerseLinkingService {
         } catch (error) {
             console.error('Error initializing chapter navigation:', error);
             return Promise.reject(error);
+        }
+    }
+
+    clearAnalysisSections() {
+        const containers = [
+            '.historical-context-content',
+            '.theological-insights-content'
+        ].map(selector => document.querySelector(selector));
+
+        containers.forEach(container => {
+            if (container) {
+                container.innerHTML = '<p class="empty-state">Select a verse to see content</p>';
+            }
+        });
+    }
+
+    showLoadingState() {
+        const containers = [
+            '.historical-context-content',
+            '.theological-insights-content'
+        ].map(selector => document.querySelector(selector));
+
+        containers.forEach(container => {
+            if (container) {
+                container.innerHTML = '<p class="loading-state">Loading analysis...</p>';
+            }
+        });
+    }
+
+    async updateHistoricalContext(verseText) {
+        const container = document.querySelector('.historical-context-content');
+        if (!container) return;
+
+        try {
+            const context = await this.aiService.getHistoricalContext(verseText);
+            container.innerHTML = `<p>${context}</p>`;
+        } catch (error) {
+            console.error('Error getting historical context:', error);
+            container.innerHTML = '<p class="error-state">Error loading historical context</p>';
+        }
+    }
+
+    async updateTheologicalInsights(verseText) {
+        const container = document.querySelector('.theological-insights-content');
+        if (!container) return;
+
+        try {
+            const insights = await this.aiService.getTheologicalInsights(verseText);
+            container.innerHTML = `<p>${insights}</p>`;
+        } catch (error) {
+            console.error('Error getting theological insights:', error);
+            container.innerHTML = '<p class="error-state">Error loading theological insights</p>';
         }
     }
 }
