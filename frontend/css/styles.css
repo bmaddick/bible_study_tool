@@ -105,12 +105,13 @@ body {
 /* Study Container Layout */
 .study-container {
     display: grid;
-    grid-template-columns: 65% 35%;
+    grid-template-columns: 2fr 1fr; /* Adjusted for a wider layout */
     gap: 2rem;
-    max-width: 1400px;
+    max-width: 80vw; /* Use 90% of viewport width instead of fixed 1400px */
     margin: 0 auto;
     padding: 2rem;
 }
+
 
 .chapter-container {
     background: var(--background-color);
@@ -119,6 +120,8 @@ body {
     border-radius: 0.5rem;
     min-height: 600px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 1.5rem 2.5rem; /* Reduce padding if needed */
+    max-width: 100%; /* Ensure they span the full grid column width */
 }
 
 .verse-container {
@@ -153,7 +156,6 @@ body {
 /* Analysis Container and Sections */
 .analysis-container {
     background: var(--background-color);
-    padding: 2.5rem;
     border: 1px solid #E2E8F0;
     border-radius: 0.5rem;
     min-height: 600px;
@@ -161,6 +163,8 @@ body {
     flex-direction: column;
     gap: 2.5rem;
     box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    padding: 1.5rem 2.5rem; /* Reduce padding if needed */
+    max-width: 100%; /* Ensure they span the full grid column width */
 }
 
 .analysis-container section {
@@ -311,7 +315,7 @@ body {
 
 /* Home Page Styles */
 .content {
-    max-width: 800px;
+    max-width: 70vw;
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
