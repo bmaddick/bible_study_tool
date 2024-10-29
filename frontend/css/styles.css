@@ -1,259 +1,446 @@
 :root {
     --primary-color: #2B6CB0;
     --secondary-color: #4A5568;
-    --background-color: #F7FAFC;
+    --background-color: #ffffff;
     --text-color: #1A202C;
     --error-color: #E53E3E;
     --success-color: #38A169;
+    --font-family: 'Quicksand', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
+/* Base styles */
 body {
-    font-family: system-ui, -apple-system, sans-serif;
-    background-color: var(--background-color);
+    font-family: var(--font-family);
     color: var(--text-color);
-    line-height: 1.6;
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    background-color: #F7FAFC;
 }
 
-.container {
+/* Main Navigation */
+.main-nav {
+    background: var(--background-color);
+    border-bottom: 1px solid #E2E8F0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-container {
     max-width: 1200px;
+    margin: 0 auto;
+    padding: 1.25rem 2rem;
+    display: flex;
+    gap: 2.5rem;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.nav-link {
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: var(--primary-color);
+}
+
+.nav-link.active {
+    color: var(--primary-color);
+    font-weight: 600;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* Search Container */
+.search-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+#verse-search {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #E2E8F0;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+#verse-search:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.1);
+}
+
+.search-btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-btn:hover {
+    background-color: #2C5282;
+}
+
+.search-error {
+    color: var(--error-color);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
+
+/* Study Container Layout */
+.study-container {
+    display: grid;
+    grid-template-columns: 65% 35%;
+    gap: 2rem;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 2rem;
 }
 
-/* Navigation styles */
-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
-
-nav {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-}
-
-.nav-btn {
-    padding: 0.5rem 1rem;
-    background-color: var(--secondary-color);
-    color: white;
-    border: none;
-    border-radius: 0.375rem;
-    cursor: pointer;
-}
-
-.nav-btn.active {
-    background-color: var(--primary-color);
-}
-
-/* Content sections */
-.section {
-    display: none;
-    padding: 2rem;
-    background: white;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.section.active {
-    display: block;
-}
-
-/* Form elements */
-input, textarea, button {
-    padding: 0.75rem;
-    border-radius: 0.375rem;
-    width: 100%;
-}
-
-button {
-    background-color: var(--primary-color);
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-button:hover {
-    background-color: #2C5282;
-}
-
-.search-container, .ai-container {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-}
-
-#searchResults, #aiResponse {
-    margin-top: 1rem;
-    padding: 1rem;
+.chapter-container {
+    background: var(--background-color);
+    padding: 2.5rem;
     border: 1px solid #E2E8F0;
-    border-radius: 0.375rem;
-    min-height: 100px;
-}
-
-/* Verse display styles */
-.verse-container {
-    padding: 1rem;
-    line-height: 1.8;
-}
-
-.verse {
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    background-color: white;
     border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    min-height: 600px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-.verse-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid #E2E8F0;
+.verse-container {
+    margin-top: 1.5rem;
+    line-height: 1.8;
+    font-size: 1.1rem;
 }
 
-.verse-reference {
-    font-weight: 600;
+.verse-number {
+    font-weight: var(--font-weight-bold);
+    color: var(--primary-color);
+    margin-right: 0.75rem;
+    cursor: pointer;
+    user-select: none;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.verse-number:hover {
+    background-color: #EBF4FF;
     color: var(--primary-color);
 }
 
-.verse-version {
-    font-size: 0.875rem;
-    color: var(--secondary-color);
-    padding: 0.25rem 0.5rem;
-    background-color: var(--background-color);
+.verse-number.selected {
+    background-color: var(--primary-color);
+    color: white;
+    padding: 0.2rem 0.4rem;
     border-radius: 0.25rem;
 }
 
-.verse-text {
-    font-size: 1.125rem;
-    line-height: 1.8;
-}
-
-/* Loading and error states */
-.loading {
-    text-align: center;
-    color: var(--secondary-color);
-    padding: 2rem;
-}
-
-.error {
-    color: var(--error-color);
-    padding: 1rem;
-    background-color: #FED7D7;
-    border-radius: 0.375rem;
-    margin-top: 1rem;
-}
-
-/* Search improvements */
-#verse-search {
-    font-size: 1rem;
+/* Analysis Container and Sections */
+.analysis-container {
+    background: var(--background-color);
+    padding: 2.5rem;
     border: 1px solid #E2E8F0;
-    transition: border-color 0.2s;
-}
-
-#verse-search:focus {
-    border-color: var(--primary-color);
-    outline: none;
-    box-shadow: 0 0 0 1px var(--primary-color);
-}
-
-#search-button {
-    margin-top: 0.5rem;
-}
-
-/* AI Section Tabs */
-.ai-tabs {
-    display: flex;
-    gap: 0.5rem;
-    border-bottom: 2px solid var(--secondary-color);
-    margin-bottom: 1rem;
-}
-
-.ai-tab {
-    padding: 0.5rem 1rem;
-    background: none;
-    color: var(--secondary-color);
-    border: none;
-    cursor: pointer;
-    width: auto;
-}
-
-.ai-tab.active {
-    color: var(--primary-color);
-    border-bottom: 2px solid var(--primary-color);
-    margin-bottom: -2px;
-}
-
-/* AI Tab Content */
-.ai-tab-content {
-    display: none;
-    margin-bottom: 1rem;
-}
-
-.ai-tab-content.active {
-    display: block;
-}
-
-/* AI Forms */
-#debateForm, #apologeticsForm {
+    border-radius: 0.5rem;
+    min-height: 600px;
     display: flex;
     flex-direction: column;
-    gap: 1rem;
+    gap: 2.5rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
-#position1, #position2, #apologeticsQuery {
-    min-height: 100px;
-    resize: vertical;
-}
-
-/* AI Response Styling */
-.ai-response-container {
-    margin-top: 1.5rem;
-    padding: 1rem;
+.analysis-container section {
+    background: var(--background-color);
+    padding: 2rem;
     border: 1px solid #E2E8F0;
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    transition: box-shadow 0.2s ease;
 }
 
-.ai-response h3 {
+.analysis-container h3 {
     color: var(--primary-color);
     font-size: 1.25rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
 }
 
-.ai-response h4 {
+.analysis-container .empty-state {
     color: var(--secondary-color);
-    font-size: 1.1rem;
-    margin: 1rem 0 0.5rem;
+    font-size: 0.95rem;
+    text-align: center;
+    padding: 2rem;
+    background-color: #F7FAFC;
+    border-radius: 0.5rem;
+    border: 1px dashed #E2E8F0;
+    margin: 1rem 0;
+    transition: all 0.2s ease;
 }
 
-.ai-response ul {
-    list-style-type: disc;
-    margin-left: 1.5rem;
-    margin-bottom: 1rem;
+.related-verses-section,
+.historical-context-section,
+.theological-insights-section {
+    position: relative;
+    padding: 1.5rem;
+    background: #FFFFFF;
+    border-radius: 0.5rem;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
-.ai-response li {
-    margin-bottom: 0.5rem;
+.related-verses-content,
+.historical-context-content,
+.theological-insights-content {
+    margin-top: 1rem;
+    line-height: 1.6;
+}
+
+.loading-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    animation: pulse 1.5s infinite;
+}
+
+.chapter-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 2rem 0;
+    gap: 1.5rem;
+    background: var(--background-color);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.chapter-navigation button {
+    padding: 1rem 2rem;
+    color: white;
+    border: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    min-width: 160px;
+    text-align: center;
+}
+
+.chapter-navigation button:first-child {
+    background: linear-gradient(to right, var(--secondary-color), #718096);
+}
+
+.chapter-navigation button:last-child {
+    background: linear-gradient(to right, var(--primary-color), #4299E1);
+}
+
+.chapter-navigation button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    filter: brightness(110%);
+}
+
+.chapter-navigation button:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    filter: brightness(95%);
+}
+
+.chapter-navigation button:disabled {
+    background: #E2E8F0;
+    cursor: not-allowed;
+    opacity: 0.6;
+    transform: none;
+    box-shadow: none;
+    filter: none;
 }
 
 /* Responsive Design */
 @media (max-width: 768px) {
-    .ai-tabs {
-        flex-direction: column;
-        gap: 0;
-        border-bottom: none;
-    }
-
-    .ai-tab {
-        border-bottom: 1px solid var(--secondary-color);
-        text-align: left;
+    .study-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
         padding: 1rem;
     }
 
-    .ai-tab.active {
-        margin-bottom: 0;
+    .chapter-container,
+    .analysis-container {
+        min-height: auto;
+        padding: 1.5rem;
+    }
+
+    .analysis-container {
+        gap: 1.5rem;
+    }
+
+    .nav-container {
+        padding: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .chapter-navigation {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .chapter-navigation button {
+        width: 100%;
+    }
+}
+
+/* Home Page Styles */
+.content {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    text-align: center;
+}
+
+.content h1 {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-weight: 600;
+}
+
+.scripture-quote {
+    font-size: 1.25rem;
+    color: var(--secondary-color);
+    margin: 2rem 0;
+    font-style: italic;
+    line-height: 1.6;
+}
+
+.getting-started {
+    text-align: center;
+    margin-top: 3rem;
+}
+
+.getting-started h2 {
+    font-size: 2rem;
+    color: var(--primary-color);
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.welcome {
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    line-height: 1.6;
+    color: var(--secondary-color);
+}
+
+.steps {
+    list-style: none;
+    padding: 0;
+    margin: 2rem 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.steps li {
+    background: var(--background-color);
+    padding: 2rem;
+    border-radius: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    border: 1px solid #E2E8F0;
+    transition: transform 0.2s ease;
+}
+
+.steps h3 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
+}
+
+.steps p {
+    color: var(--secondary-color);
+    line-height: 1.6;
+}
+
+.encouragement {
+    font-size: 1.1rem;
+    margin: 2rem 0;
+    color: var(--secondary-color);
+}
+
+.note {
+    font-size: 0.9rem;
+    color: var(--secondary-color);
+    font-style: italic;
+}
+
+/* Responsive adjustments for home page */
+@media (max-width: 768px) {
+    .content {
+        padding: 1rem;
+    }
+
+    .content h1 {
+        font-size: 2rem;
+    }
+
+    .scripture-quote {
+        font-size: 1.1rem;
+    }
+
+    .steps {
+        gap: 1.5rem;
+    }
+
+    .steps li {
+        padding: 1.5rem;
+    }
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+}
+
+/* Responsive adjustments for study page */
+@media (max-width: 768px) {
+    .study-container {
+        grid-template-columns: 1fr;
+        padding: 1rem;
+        gap: 1.5rem;
+    }
+
+    .chapter-container,
+    .analysis-container {
+        padding: 1.5rem;
+        min-height: auto;
+    }
+
+    .verse-container {
+        font-size: 1rem;
+    }
+
+    .analysis-container section {
+        padding: 1.25rem;
     }
 }

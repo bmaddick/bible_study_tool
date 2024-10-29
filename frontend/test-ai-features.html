@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bible Study AI Features Test</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/highlight-styles.css">
+    <style>
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .feature-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .response-area {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 4px;
+            min-height: 100px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Bible Study AI Features Test</h1>
+
+        <!-- Verse Interpretation -->
+        <div class="feature-section">
+            <h2>Verse Interpretation</h2>
+            <div>
+                <input type="text" id="verseReference" placeholder="Enter verse reference (e.g., Genesis 1:1)">
+                <button onclick="interpretVerse()">Get Interpretation</button>
+            </div>
+            <div id="interpretationResponse" class="response-area"></div>
+        </div>
+
+        <!-- Theological Q&A -->
+        <div class="feature-section">
+            <h2>Theological Q&A</h2>
+            <textarea id="theologicalQuestion" placeholder="Enter your theological question..."></textarea>
+            <button onclick="askTheological()">Ask Question</button>
+            <div id="theologicalResponse" class="response-area"></div>
+        </div>
+
+        <!-- Debate Simulation -->
+        <div class="feature-section">
+            <h2>Debate Simulation</h2>
+            <input type="text" id="debateTopic" placeholder="Enter debate topic">
+            <input type="text" id="viewA" placeholder="First perspective">
+            <input type="text" id="viewB" placeholder="Second perspective">
+            <button onclick="simulateDebate()">Start Debate</button>
+            <div id="debateResponse" class="response-area"></div>
+        </div>
+
+        <!-- Apologetics -->
+        <div class="feature-section">
+            <h2>Christian Apologetics</h2>
+            <textarea id="apologeticsQuestion" placeholder="Enter your question about Christianity..."></textarea>
+            <button onclick="getApologetics()">Get Answer</button>
+            <div id="apologeticsResponse" class="response-area"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { AIService } from './js/aiService.js';
+
+        const ai = new AIService();
+
+        // Make AI service available globally
+        window.ai = ai;
+
+        // Define handler functions
+        window.interpretVerse = async function() {
+            const reference = document.getElementById('verseReference').value;
+            const response = await ai.getVerseInterpretation("Sample verse text", reference);
+            displayResponse('interpretationResponse', response);
+        };
+
+        window.askTheological = async function() {
+            const question = document.getElementById('theologicalQuestion').value;
+            const response = await ai.getTheologicalAnswer(question);
+            displayResponse('theologicalResponse', response);
+        };
+
+        window.simulateDebate = async function() {
+            const topic = document.getElementById('debateTopic').value;
+            const viewA = document.getElementById('viewA').value;
+            const viewB = document.getElementById('viewB').value;
+            const response = await ai.simulateDebate(topic, viewA, viewB);
+            displayResponse('debateResponse', response);
+        };
+
+        window.getApologetics = async function() {
+            const question = document.getElementById('apologeticsQuestion').value;
+            const response = await ai.getApologeticsResponse(question);
+            displayResponse('apologeticsResponse', response);
+        };
+
+        function displayResponse(elementId, response) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = '<pre>' + JSON.stringify(response, null, 2) + '</pre>';
+        }
+    </script>
+</body>
+</html>
