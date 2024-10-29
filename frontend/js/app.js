@@ -21,8 +21,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Make bibleService available globally for debugging
         window.bibleService = bibleService;
 
-        // Initialize verse linking service
-        const verseLinkingService = new VerseLinkingService(bibleService);
+        // Initialize AI service
+        const aiService = new AIService();
+        aiService.setBibleService(bibleService);
+
+        // Initialize verse linking service with both Bible and AI services
+        const verseLinkingService = new VerseLinkingService(bibleService, aiService);
         await verseLinkingService.initialize();
 
         // Initialize search functionality
