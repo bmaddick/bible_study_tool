@@ -18,7 +18,87 @@ body {
     background-color: #F7FAFC;
 }
 
-/* ... keeping all existing styles up to study container ... */
+/* Main Navigation */
+.main-nav {
+    background: var(--background-color);
+    border-bottom: 1px solid #E2E8F0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+}
+
+.nav-link {
+    color: var(--secondary-color);
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 0;
+    transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+    color: var(--primary-color);
+}
+
+.nav-link.active {
+    color: var(--primary-color);
+    font-weight: 600;
+    border-bottom: 2px solid var(--primary-color);
+}
+
+/* Search Container */
+.search-container {
+    max-width: 1400px;
+    margin: 2rem auto;
+    padding: 0 2rem;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+#verse-search {
+    flex: 1;
+    padding: 0.75rem 1rem;
+    border: 1px solid #E2E8F0;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
+}
+
+#verse-search:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(43, 108, 176, 0.1);
+}
+
+.search-btn {
+    padding: 0.75rem 1.5rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 0.375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-btn:hover {
+    background-color: #2C5282;
+}
+
+.search-error {
+    color: var(--error-color);
+    font-size: 0.875rem;
+    margin-top: 0.5rem;
+}
 
 /* Study Container Layout */
 .study-container {
@@ -117,50 +197,58 @@ body {
 .chapter-navigation {
     display: flex;
     justify-content: space-between;
-    margin-top: 2rem;
-    gap: 1rem;
-    background: #F7FAFC;
-    padding: 1rem;
-    border-radius: 0.5rem;
+    align-items: center;
+    margin: 2rem 0;
+    gap: 1.5rem;
+    background: var(--background-color);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    border: 1px solid #E2E8F0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 
 .chapter-navigation button {
-    padding: 0.75rem 1.25rem;
+    padding: 1rem 2rem;
     color: white;
     border: none;
-    border-radius: 0.375rem;
+    border-radius: 0.5rem;
     cursor: pointer;
-    font-weight: var(--font-weight-medium);
-    transition: all 0.2s ease;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
-    top: 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    min-width: 160px;
+    text-align: center;
 }
 
 .chapter-navigation button:first-child {
-    background: var(--secondary-color);
+    background: linear-gradient(to right, var(--secondary-color), #718096);
 }
 
 .chapter-navigation button:last-child {
-    background: var(--primary-color);
+    background: linear-gradient(to right, var(--primary-color), #4299E1);
 }
 
 .chapter-navigation button:hover {
-    top: -2px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    filter: brightness(110%);
 }
 
 .chapter-navigation button:active {
-    top: 1px;
-    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    filter: brightness(95%);
 }
 
 .chapter-navigation button:disabled {
     background: #E2E8F0;
     cursor: not-allowed;
-    opacity: 0.7;
-    top: 0;
+    opacity: 0.6;
+    transform: none;
     box-shadow: none;
+    filter: none;
 }
 
 /* Responsive Design */
