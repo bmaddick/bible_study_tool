@@ -5,6 +5,7 @@ import { initializeSearch } from './search.js';
 import { initializeAI } from './ai.js';
 import VerseLinkingService from './verseLinking.js';
 import { BibleService } from './bibleService.js';
+import { AIService } from './aiService.js';
 
 // Initialize all modules when DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
