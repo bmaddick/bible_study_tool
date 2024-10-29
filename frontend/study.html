@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Study Bible - Bible Study Tool</title>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@chakra-ui/css/reset@2.3.1/dist/reset.min.css" rel="stylesheet">
+    <link href="css/reset.css" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
@@ -21,28 +21,47 @@
     </nav>
 
     <main class="content">
-        <div class="bible-content">
-            <div class="verse-container">
-                <div class="verse">
-                    <div class="verse-header">
-                        <span class="verse-reference"></span>
-                        <span class="verse-version">ASV</span>
-                    </div>
-                    <div class="verse-text"></div>
-                </div>
-            </div>
-        </div>
         <div class="search-container">
             <input type="text" id="verse-search" placeholder="Enter verse reference (e.g., John 3:16)" aria-label="Verse reference search">
             <button id="search-button" class="search-btn" aria-label="Search for verse">Search</button>
+            <div id="search-error" class="search-error" style="display: none;"></div>
         </div>
-        <div id="aiResponse" class="ai-response-container"></div>
+
+        <div class="study-container">
+            <div class="chapter-container">
+                <div class="chapter-header">
+                    <span class="chapter-reference"></span>
+                    <span class="version">ASV</span>
+                </div>
+                <div class="chapter-content" role="region" aria-label="Bible chapter content"></div>
+                <div class="chapter-navigation">
+                    <button id="prev-chapter" class="nav-btn">Previous Chapter</button>
+                    <button id="next-chapter" class="nav-btn">Next Chapter</button>
+                </div>
+            </div>
+            <div class="analysis-container">
+                <section class="related-verses-section">
+                    <h3>Related Verses</h3>
+                    <div class="related-verses-content">
+                        <p class="empty-state">Select a verse number to see related verses</p>
+                    </div>
+                </section>
+                <section class="historical-context-section" role="region" aria-label="Historical Context">
+                    <h3>Historical Context</h3>
+                    <div class="historical-context-content">
+                        <p class="empty-state">Select a verse to see historical context</p>
+                    </div>
+                </section>
+                <section class="theological-insights-section" role="region" aria-label="Theological Insights">
+                    <h3>Theological Insights</h3>
+                    <div class="theological-insights-content">
+                        <p class="empty-state">Select a verse to see theological insights</p>
+                    </div>
+                </section>
+            </div>
+        </div>
     </main>
 
     <script src="js/app.js" type="module"></script>
-    <script src="js/bibleService.js" type="module"></script>
-    <script src="js/aiService.js" type="module"></script>
-    <script src="js/highlightService.js" type="module"></script>
-    <script src="js/displayService.js" type="module"></script>
 </body>
 </html>
