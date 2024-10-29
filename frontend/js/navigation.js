@@ -6,36 +6,52 @@ export function initializeNavigation() {
         'debate': document.getElementById('debate')
     };
 
-    // Handle hash changes
-    function handleHashChange() {
-        const hash = window.location.hash.slice(1) || '';
+    // Handle both page and hash-based navigation
+    function updateNavigation() {
+        const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+        const currentHash = window.location.hash.slice(1);
 
-        // Hide all sections
+        // Hide all sections first
         Object.values(sections).forEach(section => {
             if (section) section.style.display = 'none';
         });
 
-        // Show the selected section
-        const currentSection = sections[hash];
+        // Show section if hash matches
+        const currentSection = sections[currentHash];
         if (currentSection) {
             currentSection.style.display = 'block';
         }
 
         // Update active nav link
-        document.querySelectorAll('.nav-link').forEach(link => {
+        document.querySelectorAll('nav a').forEach(link => {
             link.classList.remove('active');
-            if (link.getAttribute('href') === `#${hash}` ||
-                (!hash && link.getAttribute('href') === 'index.html')) {
-                link.classList.add('active');
+            const href = link.getAttribute('href');
+
+            // Handle main navigation (index.html and study.html)
+            if (!href.includes('#')) {
+                const linkPath = href || 'index.html';
+                if (linkPath === currentPath) {
+                    link.classList.add('active');
+                }
+            }
+            // Handle hash-based navigation
+            else {
+                const [linkPath, linkHash] = href.split('#');
+                if (linkPath === currentPath && linkHash === currentHash) {
+                    link.classList.add('active');
+                }
             }
         });
     }
 
     // Listen for hash changes
-    window.addEventListener('hashchange', handleHashChange);
+    window.addEventListener('hashchange', updateNavigation);
 
-    // Handle initial load
-    handleHashChange();
+    // Listen for page load
+    window.addEventListener('load', updateNavigation);
+
+    // Handle initial state
+    updateNavigation();
 
     // Initialize AI response handlers
     document.getElementById('ask-faith')?.addEventListener('click', handleFaithQuestion);

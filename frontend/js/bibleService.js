@@ -7,6 +7,15 @@ export class BibleService {
         this.initializationError = null;
     }
 
+    isValidVerse(verse) {
+        return verse &&
+            typeof verse === 'object' &&
+            typeof verse.book_name === 'string' &&
+            typeof verse.chapter === 'number' &&
+            typeof verse.verse === 'number' &&
+            typeof verse.text === 'string';
+    }
+
     // Parse reference into standardized format and handle verse ranges
     parseReference(reference) {
         console.log(`Parsing reference: ${reference}`);
@@ -70,11 +79,42 @@ export class BibleService {
             const data = await response.json();
             console.log('ASV data loaded, checking structure...');
 
-            // Ensure we're working with an array of verses
-            this.verses = Array.isArray(data) ? data : data.verses;
-            if (!Array.isArray(this.verses)) {
-                throw new Error('Invalid ASV data structure: expected array of verses');
+            // Validate root structure
+            if (!data || typeof data !== 'object') {
+                throw new Error('Invalid Bible data structure: root must be an object');
             }
+
+            // Check if data has metadata and verses properties
+            if (!data.verses || typeof data.verses !== 'object' || !data.metadata) {
+                throw new Error('Invalid Bible data structure: must contain metadata and verses objects');
+            }
+
+            // Store metadata
+            this.metadata = data.metadata;
+
+            // Process and validate verses
+            const processedVerses = {};
+            let validVerseCount = 0;
+
+            // Iterate through numbered verse objects
+            for (const key in data.verses) {
+                const verse = data.verses[key];
+                if (this.isValidVerse(verse)) {
+                    // Create a unique key combining book, chapter, and verse
+                    const verseKey = `${verse.book_name}_${verse.chapter}_${verse.verse}`;
+                    processedVerses[verseKey] = verse;
+                    validVerseCount++;
+                } else {
+                    console.warn(`Skipping invalid verse at key ${key}`);
+                }
+            }
+
+            if (validVerseCount === 0) {
+                throw new Error('Invalid Bible data structure: no valid verses found in data');
+            }
+
+            this.verses = processedVerses;
+            console.log(`Successfully loaded ${validVerseCount} valid verses from ASV data`);
 
             console.log('Building verse index...');
             await this.buildVerseIndex();
@@ -91,7 +131,6 @@ export class BibleService {
             throw error;
         }
     }
-
     async buildVerseIndex() {
         const normalizeBookName = (name) => {
             return name
@@ -103,7 +142,7 @@ export class BibleService {
                 .trim();
         };
 
-        for (const verse of this.verses) {
+        for (const verse of Object.values(this.verses)) {
             if (!verse || !verse.book_name || !verse.chapter || !verse.verse) continue;
 
             // Create reference variations
@@ -139,27 +178,48 @@ export class BibleService {
         console.log(`Looking up verse: ${reference}`);
 
         try {
+            if (!reference || typeof reference !== 'string') {
+                throw new Error('Invalid verse reference: must be a non-empty string');
+            }
+
             const parsedRefs = this.parseReference(reference);
             console.log(`Parsed ${parsedRefs.length} references for range: ${reference}`);
             const verses = [];
 
             for (const ref of parsedRefs) {
                 console.log(`Processing reference: ${ref.reference}`);
-                // Try exact match first
-                let verse = this.verseIndex.get(ref.reference);
 
-                // Try alternate formats if exact match fails
+                // Normalize book names for comparison
+                const normalizedRefBook = ref.book.toLowerCase()
+                    .replace(/\s+/g, '')
+                    .replace(/first/i, '1')
+                    .replace(/second/i, '2')
+                    .replace(/third/i, '3');
+
+                // Create verse key in the format book_name_chapter_verse
+                const verseKey = `${normalizedRefBook}_${ref.chapter}_${ref.verse}`;
+                console.log(`Looking for verse key: ${verseKey}`);
+
+                // Try exact match first
+                let verse = this.verses[verseKey];
+
+                // If no exact match, try fuzzy matching
                 if (!verse) {
-                    const normalizedRef = `${ref.book} ${ref.chapter}:${ref.verse}`;
-                    console.log(`Trying normalized reference: ${normalizedRef}`);
-                    verse = this.verseIndex.get(normalizedRef) ||
-                           this.findVerseByFuzzyMatch(normalizedRef);
+                    const matchingKeys = Object.keys(this.verses).filter(key => {
+                        const [bookName, chapter, verseNum] = key.split('_');
+                        return bookName.toLowerCase().includes(normalizedRefBook) &&
+                               chapter === ref.chapter &&
+                               verseNum === ref.verse;
+                    });
+
+                    if (matchingKeys.length > 0) {
+                        verse = this.verses[matchingKeys[0]];
+                    }
                 }
 
                 if (!verse) {
                     console.warn(`Verse not found: ${ref.reference}`);
-                    this.logAvailableReferences();
-                    throw new Error(`Verse not found: ${ref.reference}`);
+                    throw new Error(`Verse not found: ${ref.reference}. Please check the book name, chapter, and verse number.`);
                 }
 
                 console.log(`Found verse: ${ref.reference}`);
@@ -178,7 +238,6 @@ export class BibleService {
             throw error;
         }
     }
-
     findVerseByFuzzyMatch(reference) {
         const [bookName, verseRef] = reference.split(/\s+(?=\d+:)/);
         const normalizedSearch = bookName.toLowerCase();

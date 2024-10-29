@@ -22,15 +22,15 @@ class BibleAPIService {
                 const response = await fetch('/data/asv.json');
                 this.bibleData = await response.json();
 
-                // Validate the loaded data is an array
-                if (!Array.isArray(this.bibleData)) {
-                    throw new Error('Invalid Bible data structure: root must be an array');
+                // Validate the loaded data structure
+                if (!this.bibleData || typeof this.bibleData !== 'object' || !this.bibleData.verses) {
+                    throw new Error('Invalid Bible data structure: root must be an object with verses property');
                 }
 
                 console.log('Bible data loaded:', {
-                    isArray: Array.isArray(this.bibleData),
-                    length: this.bibleData.length,
-                    sampleVerse: this.bibleData[0]
+                    hasVerses: !!this.bibleData.verses,
+                    metadata: this.bibleData.metadata,
+                    verseCount: Object.keys(this.bibleData.verses).length
                 });
                 this.buildBookIndexMap();
             }
@@ -90,31 +90,21 @@ class BibleAPIService {
         console.log('Looking up verse with normalized book name:', normalizedBookName);
 
         // Validate Bible data
-        if (!Array.isArray(this.bibleData)) {
-            throw new Error('Invalid Bible data structure: data must be an array');
-        }
-
-        // Find the starting index for the book
-        const startIndex = this.bookIndexMap.get(normalizedBookName);
-        if (startIndex === undefined) {
-            throw new Error(`Book ${bookName} not found in Bible data`);
+        if (!this.bibleData || !this.bibleData.verses) {
+            throw new Error('Invalid Bible data structure: data must contain verses object');
         }
 
         // Search for the specific verse
-        let verseObj = null;
         const targetChapter = parseInt(chapter);
         const targetVerse = parseInt(verse);
+        let verseObj = null;
 
-        for (let i = startIndex; i < this.bibleData.length; i++) {
-            const currentVerse = this.bibleData[i];
+        // Search through verses object
+        for (const key in this.bibleData.verses) {
+            const currentVerse = this.bibleData.verses[key];
 
-            // Break if we've moved past the current book
-            if (!currentVerse || currentVerse.book_name !== normalizedBookName) {
-                break;
-            }
-
-            // Check if we've found the matching verse
-            if (parseInt(currentVerse.chapter) === targetChapter &&
+            if (currentVerse.book_name === normalizedBookName &&
+                parseInt(currentVerse.chapter) === targetChapter &&
                 parseInt(currentVerse.verse) === targetVerse) {
                 verseObj = currentVerse;
                 console.log('Found matching verse:', verseObj);
