@@ -5,7 +5,6 @@ import { initializeSearch } from './search.js';
 import { initializeAI } from './ai.js';
 import VerseLinkingService from './verseLinking.js';
 import { BibleService } from './bibleService.js';
-import { AIService } from './aiService.js';
 
 // Initialize all modules when DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
@@ -22,12 +21,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Make bibleService available globally for debugging
         window.bibleService = bibleService;
 
-        // Initialize AI service
-        const aiService = new AIService();
-        aiService.setBibleService(bibleService);
-
-        // Initialize verse linking service with both Bible and AI services
-        const verseLinkingService = new VerseLinkingService(bibleService, aiService);
+        // Initialize verse linking service
+        const verseLinkingService = new VerseLinkingService(bibleService);
         await verseLinkingService.initialize();
 
         // Initialize search functionality
