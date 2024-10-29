@@ -71,7 +71,7 @@ export class BibleService {
 
         try {
             console.log('Initializing Bible Service...');
-            const response = await fetch('../data/asv.json');
+            const response = await fetch('data/asv.json');
             if (!response.ok) {
                 throw new Error(`Failed to fetch ASV data: ${response.status} ${response.statusText}`);
             }
@@ -131,37 +131,32 @@ export class BibleService {
             throw error;
         }
     }
+    normalizeBookName(name) {
+        return name
+            .replace(/^(\d+)\s+/, (match, num) => {
+                const numbers = ['First', 'Second', 'Third'];
+                return `${numbers[parseInt(num) - 1] || num} `;
+            })
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
     async buildVerseIndex() {
-        const normalizeBookName = (name) => {
-            return name
-                .replace(/^(\d+)\s+/, (match, num) => {
-                    const numbers = ['First', 'Second', 'Third'];
-                    return `${numbers[parseInt(num) - 1] || num} `;
-                })
-                .replace(/\s+/g, ' ')
-                .trim();
-        };
 
         for (const verse of Object.values(this.verses)) {
             if (!verse || !verse.book_name || !verse.chapter || !verse.verse) continue;
 
-            // Create reference variations
-            const bookVariations = [
-                verse.book_name,                                           // Original
-                normalizeBookName(verse.book_name),                       // Normalized
-                verse.book_name.replace(/^(\d+)/, '$1st'),               // 1st format
-                verse.book_name.toLowerCase(),                            // Lowercase
-                normalizeBookName(verse.book_name).toLowerCase()          // Normalized lowercase
-            ];
-
+            // Create canonical reference format
+            const normalizedBookName = this.normalizeBookName(verse.book_name);
             const verseRef = `${verse.chapter}:${verse.verse}`;
-            const uniqueVariations = [...new Set(bookVariations)];
+            const reference = `${normalizedBookName} ${verseRef}`;
 
-            // Index all variations
-            for (const bookName of uniqueVariations) {
-                const reference = `${bookName} ${verseRef}`;
-                this.verseIndex.set(reference, verse);
-            }
+            // Index only the canonical form
+            this.verseIndex.set(reference, verse);
+
+            // Store original book name for exact matches
+            verse.originalBookName = verse.book_name;
+            verse.normalizedBookName = normalizedBookName;
         }
     }
 
@@ -189,43 +184,23 @@ export class BibleService {
             for (const ref of parsedRefs) {
                 console.log(`Processing reference: ${ref.reference}`);
 
-                // Normalize book names for comparison
-                const normalizedRefBook = ref.book.toLowerCase()
-                    .replace(/\s+/g, '')
-                    .replace(/first/i, '1')
-                    .replace(/second/i, '2')
-                    .replace(/third/i, '3');
+                // Create canonical reference format using the same normalization as buildVerseIndex
+                const normalizedBookName = this.normalizeBookName(ref.book);
+                const canonicalReference = `${normalizedBookName} ${ref.chapter}:${ref.verse}`;
+                console.log(`Looking for canonical reference: ${canonicalReference}`);
 
-                // Create verse key in the format book_name_chapter_verse
-                const verseKey = `${normalizedRefBook}_${ref.chapter}_${ref.verse}`;
-                console.log(`Looking for verse key: ${verseKey}`);
-
-                // Try exact match first
-                let verse = this.verses[verseKey];
-
-                // If no exact match, try fuzzy matching
-                if (!verse) {
-                    const matchingKeys = Object.keys(this.verses).filter(key => {
-                        const [bookName, chapter, verseNum] = key.split('_');
-                        return bookName.toLowerCase().includes(normalizedRefBook) &&
-                               chapter === ref.chapter &&
-                               verseNum === ref.verse;
-                    });
-
-                    if (matchingKeys.length > 0) {
-                        verse = this.verses[matchingKeys[0]];
-                    }
-                }
+                // Look up verse directly using canonical reference
+                const verse = this.verseIndex.get(canonicalReference);
 
                 if (!verse) {
-                    console.warn(`Verse not found: ${ref.reference}`);
+                    console.warn(`Verse not found: ${canonicalReference}`);
                     throw new Error(`Verse not found: ${ref.reference}. Please check the book name, chapter, and verse number.`);
                 }
 
-                console.log(`Found verse: ${ref.reference}`);
+                console.log(`Found verse: ${canonicalReference}`);
                 verses.push({
                     ...verse,
-                    reference: ref.reference
+                    reference: canonicalReference
                 });
             }
 
@@ -289,6 +264,14 @@ export class BibleService {
         await this.initialize();
         const books = new Set(Array.from(this.verseIndex.values()).map(verse => verse.book_name));
         return Array.from(books).sort();
+    }
+
+    async getChapterCount(book) {
+        await this.initialize();
+        const chapters = new Set(Array.from(this.verseIndex.values())
+            .filter(verse => verse.book_name === book)
+            .map(verse => verse.chapter));
+        return Math.max(...Array.from(chapters));
     }
 
     async findRelatedVerses(reference) {
