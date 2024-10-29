@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bible Service Test</title>
+</head>
+<body>
+    <h1>Bible Service Test</h1>
+    <div>
+        <input type="text" id="verseInput" placeholder="Enter verse (e.g., Genesis 1:1)" />
+        <button onclick="lookupVerse()">Look up verse</button>
+    </div>
+    <div>
+        <input type="text" id="searchInput" placeholder="Search text" />
+        <button onclick="searchVerses()">Search</button>
+    </div>
+    <div id="result"></div>
+
+    <script type="module">
+        import { BibleService } from './js/bibleService.js';
+
+        const bibleService = new BibleService();
+
+        // Initialize the Bible service when the page loads
+        (async function initializeBibleService() {
+            try {
+                await bibleService.initialize();
+                console.log('Bible service initialized successfully');
+            } catch (error) {
+                console.error('Failed to initialize Bible service:', error);
+                document.getElementById('result').innerHTML = `<p style="color: red">Failed to load Bible data: ${error.message}</p>`;
+            }
+        })();
+
+        window.lookupVerse = async function() {
+            const reference = document.getElementById('verseInput').value;
+            try {
+                if (!bibleService.initialized) {
+                    throw new Error('Bible service is not yet initialized');
+                }
+                const verse = await bibleService.getVerse(reference);
+                document.getElementById('result').innerHTML = `
+                    <h3>${verse.book_name} ${verse.chapter}:${verse.verse}</h3>
+                    <p>${verse.text}</p>
+                `;
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p style="color: red">${error.message}</p>`;
+            }
+        };
+
+        window.searchVerses = async function() {
+            const query = document.getElementById('searchInput').value;
+            try {
+                if (!bibleService.initialized) {
+                    throw new Error('Bible service is not yet initialized');
+                }
+                const verses = await bibleService.searchVerses(query);
+                if (verses.length === 0) {
+                    document.getElementById('result').innerHTML = '<p>No verses found matching your search.</p>';
+                    return;
+                }
+                document.getElementById('result').innerHTML = verses.map(verse => `
+                    <div>
+                        <h4>${verse.book_name} ${verse.chapter}:${verse.verse}</h4>
+                        <p>${verse.text}</p>
+                    </div>
+                `).join('');
+            } catch (error) {
+                document.getElementById('result').innerHTML = `<p style="color: red">${error.message}</p>`;
+            }
+        };
+    </script>
+</body>
+</html>

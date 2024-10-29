@@ -1,74 +1,108 @@
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bible Study Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@chakra-ui/css/reset@2.3.1/dist/reset.min.css" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Bible Study Tool</h1>
-            <nav>
-                <button id="readBtn" class="nav-btn active">Read Bible</button>
-                <button id="searchBtn" class="nav-btn">Search</button>
-                <button id="aiBtn" class="nav-btn">AI Assistant</button>
-            </nav>
-        </header>
-        <main>
-            <section id="readSection" class="section active">
-                <div class="bible-content">
-                    <div class="verse-container"></div>
-                </div>
-            </section>
-            <section id="searchSection" class="section">
-                <div class="search-container">
-                    <input
-                        type="text"
-                        id="verse-search"
-                        placeholder="Enter verse reference (e.g., John 3:16)"
-                        aria-label="Verse reference search"
-                    >
-                    <button
-                        id="search-button"
-                        aria-label="Search for verse"
-                    >Search</button>
-                </div>
-            </section>
-            <section id="aiSection" class="section">
-                <div class="ai-container">
-                    <div class="ai-tabs">
-                        <button class="ai-tab active" data-tab="general">General Questions</button>
-                        <button class="ai-tab" data-tab="debate">Debate Simulation</button>
-                        <button class="ai-tab" data-tab="apologetics">Apologetics</button>
-                    </div>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <a href="index.html" class="nav-link active">Home</a>
+            <a href="study.html" class="nav-link">Study Bible</a>
+            <a href="#questioning" class="nav-link">Questioning?</a>
+            <a href="#theological" class="nav-link">Theological questions</a>
+            <a href="#debate" class="nav-link">Theological debate</a>
+            <a href="contact.html" class="nav-link">Contact</a>
+        </div>
+    </nav>
 
-                    <div id="generalTab" class="ai-tab-content active">
-                        <textarea id="aiInput" placeholder="Ask a theological question..."></textarea>
-                        <button id="aiSubmit">Ask AI</button>
-                    </div>
+    <main class="content">
+        <h1>Study Bible</h1>
 
-                    <div id="debateTab" class="ai-tab-content">
-                        <form id="debateForm">
-                            <textarea id="position1" placeholder="Enter first theological position..."></textarea>
-                            <textarea id="position2" placeholder="Enter second theological position..."></textarea>
-                            <button type="submit">Simulate Debate</button>
-                        </form>
-                    </div>
+        <blockquote class="scripture-quote">
+            "Let the word of Christ dwell in you richly, teaching and admonishing one another in all wisdom"
+        </blockquote>
 
-                    <div id="apologeticsTab" class="ai-tab-content">
-                        <form id="apologeticsForm">
-                            <textarea id="apologeticsQuery" placeholder="Ask about Christianity's validity, truth claims, or challenges..."></textarea>
-                            <button type="submit">Get Response</button>
-                        </form>
-                    </div>
+        <section class="getting-started">
+            <h2>How to get started</h2>
 
-                    <div id="aiResponse" class="ai-response-container"></div>
-                </div>
-            </section>
-        </main>
-    </div>
+            <p class="welcome">
+                Welcome to our Bible Study Tool! This platform is designed to help you explore and understand the Bible more deeply through AI-assisted study and theological discussions.
+            </p>
+
+            <ol class="steps">
+                <li>
+                    <h3>Explore the Study Bible</h3>
+                    <p>Start by reading the ASV version of the Bible. Use our AI features to get deeper insights into verses and find related passages that support the same message.</p>
+                </li>
+                <li>
+                    <h3>Basic Questions</h3>
+                    <p>Visit our "Questioning?" section to explore fundamental aspects of Christianity and engage with our AI system for thoughtful responses to your inquiries.</p>
+                </li>
+                <li>
+                    <h3>Engage in Theological Discussions</h3>
+                    <p>Experience our unique debate simulation feature, where you can explore different theological perspectives on various topics.</p>
+                </li>
+            </ol>
+
+            <p class="encouragement">
+                We encourage you to dive deep into your study of Scripture. Whether you're new to Bible study or a seasoned theologian, our tools are here to support your journey.
+            </p>
+
+            <p class="note">
+                Note: If you notice any inconsistencies or errors in the responses, please report them using the Contact form.
+            </p>
+        </section>
+
+        <!-- Hidden sections for functionality -->
+        <section id="questioning" class="content-section">
+            <h2>Questioning Faith</h2>
+            <div class="input-container">
+                <textarea id="faith-question" placeholder="Ask your questions about faith..." rows="4"></textarea>
+                <button id="ask-faith" class="submit-button">Ask Question</button>
+            </div>
+            <div id="faith-response" class="ai-response-container"></div>
+        </section>
+
+        <section id="theological" class="content-section">
+            <h2>Theological Questions</h2>
+            <div class="input-container">
+                <textarea id="theological-question" placeholder="Ask deeper theological questions..." rows="4"></textarea>
+                <button id="ask-theological" class="submit-button">Ask Question</button>
+            </div>
+            <div id="theological-response" class="ai-response-container"></div>
+        </section>
+
+        <section id="debate" class="content-section">
+            <h2>Theological Debate</h2>
+            <div class="input-container">
+                <textarea id="debate-topic" placeholder="Enter a theological topic for debate..." rows="4"></textarea>
+                <button id="start-debate" class="submit-button">Start Debate</button>
+            </div>
+            <div id="debate-response" class="ai-response-container"></div>
+        </section>
+
+        <div id="functionality-sections" style="display: none;">
+            <div class="bible-content">
+                <div class="verse-container"></div>
+            </div>
+            <div class="search-container">
+                <input type="text" id="verse-search" placeholder="Enter verse reference (e.g., John 3:16)" aria-label="Verse reference search">
+                <button id="search-button" aria-label="Search for verse">Search</button>
+            </div>
+            <div id="aiResponse" class="ai-response-container"></div>
+        </div>
+    </main>
+
+    <script src="js/navigation.js" type="module"></script>
     <script src="js/app.js" type="module"></script>
+    <script src="js/bibleService.js" type="module"></script>
+    <script src="js/aiService.js" type="module"></script>
+    <script src="js/highlightService.js" type="module"></script>
+    <script src="js/displayService.js" type="module"></script>
 </body>
 </html>
