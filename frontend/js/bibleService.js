@@ -33,7 +33,9 @@ export class BibleService {
             /^((?:First|Second|Third|[123])\s+)?([A-Za-z]+)\s+(\d+):(\d+)(?:-(\d+))?$/,
             /^([A-Za-z]+)\s+(\d+):(\d+)(?:-(\d+))?$/,
             /^((?:First|Second|Third|[123])\s+)?([A-Za-z]+)\s+(\d+)$/,
-            /^([A-Za-z]+)\s+(\d+)$/
+            /^([A-Za-z]+)\s+(\d+)$/,
+            /^((?:First|Second|Third|[123])\s+)?([A-Za-z]+)$/,
+            /^([A-Za-z]+)$/
         ];
 
         let match = null;
@@ -49,12 +51,20 @@ export class BibleService {
 
         // Extract components based on match pattern
         const [_, prefix, bookName, chapter, startVerse, endVerse] = match;
-        const book = prefix ? `${prefix}${bookName}` : bookName;
-
+        const book = prefix ? `${prefix}${bookName}` : (bookName || _);
         const references = [];
 
-        // Handle chapter-only references
-        if (!startVerse) {
+        // Handle chapter-only and book-only references
+        if (!chapter) {
+            // Book-only reference, default to chapter 1
+            references.push({
+                book,
+                chapter: 1,
+                verse: 1,
+                reference: `${book} 1:1`,
+                isBookOnly: true
+            });
+        } else if (!startVerse) {
             references.push({
                 book,
                 chapter: parseInt(chapter),
