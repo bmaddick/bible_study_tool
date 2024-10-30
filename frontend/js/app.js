@@ -39,8 +39,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Set up chapter display event handler
         document.addEventListener('displayChapter', async (event) => {
             try {
-                const { book, chapter, highlightVerse } = event.detail;
-                await verseLinkingService.displayChapter(book, chapter, highlightVerse);
+                const { book, chapter, highlightVerses } = event.detail;
+                await verseLinkingService.displayChapter(book, chapter, highlightVerses);
             } catch (error) {
                 console.error('Error displaying chapter:', error);
                 errorContainer.innerHTML = `

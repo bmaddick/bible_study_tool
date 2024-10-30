@@ -120,7 +120,7 @@ class VerseLinkingService {
         return relatedVerses;
     }
 
-    async displayChapter(book, chapter, highlightVerse = null) {
+    async displayChapter(book, chapter, highlightVerses = null) {
         this.currentBook = book;
         this.currentChapter = chapter;
 
@@ -138,11 +138,15 @@ class VerseLinkingService {
         // Clear existing content
         chapterContent.innerHTML = '';
 
+        // Convert highlightVerses to array if it's a single value
+        const versesToHighlight = highlightVerses ?
+            (Array.isArray(highlightVerses) ? highlightVerses : [highlightVerses]) : [];
+
         // Display verses with clickable verse numbers
         verses.forEach(verse => {
             const verseElement = document.createElement('div');
             verseElement.classList.add('verse-container');
-            const isHighlighted = highlightVerse && verse.verse.toString() === highlightVerse.toString();
+            const isHighlighted = versesToHighlight.includes(verse.verse.toString());
             const isSelected = this.selectedVerses.has(`${book} ${chapter}:${verse.verse}`);
             verseElement.innerHTML = `
                 <div class="verse">
@@ -157,8 +161,8 @@ class VerseLinkingService {
             `;
             chapterContent.appendChild(verseElement);
 
-            // Scroll to highlighted verse
-            if (isHighlighted) {
+            // Scroll to first highlighted verse
+            if (isHighlighted && versesToHighlight[0].toString() === verse.verse.toString()) {
                 setTimeout(() => verseElement.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
             }
         });
