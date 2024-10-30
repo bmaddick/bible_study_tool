@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Initialize search functionality
         try {
-            const searchInit = initializeSearch(bibleService);
+            const searchInit = initializeSearch(bibleService, verseLinkingService);
             if (searchInit && typeof searchInit.then === 'function') {
                 await searchInit;
             }

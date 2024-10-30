@@ -146,7 +146,8 @@ class VerseLinkingService {
         verses.forEach(verse => {
             const verseElement = document.createElement('div');
             verseElement.classList.add('verse-container');
-            const isHighlighted = versesToHighlight.includes(verse.verse.toString());
+            const verseNum = parseInt(verse.verse);
+            const isHighlighted = versesToHighlight.some(v => parseInt(v) === verseNum);
             const isSelected = this.selectedVerses.has(`${book} ${chapter}:${verse.verse}`);
             verseElement.innerHTML = `
                 <div class="verse">
@@ -162,7 +163,7 @@ class VerseLinkingService {
             chapterContent.appendChild(verseElement);
 
             // Scroll to first highlighted verse
-            if (isHighlighted && versesToHighlight[0].toString() === verse.verse.toString()) {
+            if (isHighlighted && parseInt(versesToHighlight[0]) === verseNum) {
                 setTimeout(() => verseElement.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
             }
         });
