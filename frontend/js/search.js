@@ -13,13 +13,21 @@ export function initializeSearch(bibleService) {
         async function searchBible(query) {
             try {
                 searchError.style.display = 'none';
-                const verse = await bibleService.getVerse(query);
-                if (verse) {
-                    // If exact verse reference found, display it
-                    const [book, chapter] = verse.reference.split(' ');
-                    document.dispatchEvent(new CustomEvent('displayChapter', {
-                        detail: { book, chapter: parseInt(chapter), highlightVerse: verse.verse }
-                    }));
+                const verses = await bibleService.getVerse(query);
+                if (verses) {
+                    // Handle both single verse and verse range results
+                    const verseArray = Array.isArray(verses) ? verses : [verses];
+                    if (verseArray.length > 0) {
+                        const firstVerse = verseArray[0];
+                        const [book, chapter] = firstVerse.reference.split(' ');
+                        document.dispatchEvent(new CustomEvent('displayChapter', {
+                            detail: {
+                                book,
+                                chapter: parseInt(chapter),
+                                highlightVerses: verseArray.map(v => v.verse)
+                            }
+                        }));
+                    }
                 } else {
                     // If no exact match, search for verses containing the text
                     const results = await bibleService.searchVerses(query);
@@ -69,12 +77,16 @@ export function initializeSearch(bibleService) {
             }
         }
 
-        function highlightVerse(verseNumber) {
+        function highlightVerse(verseNumbers) {
             const verseElements = document.querySelectorAll('.verse-number');
+            const versesToHighlight = Array.isArray(verseNumbers) ? verseNumbers : [verseNumbers];
+
             verseElements.forEach(element => {
-                if (element.dataset.verseNumber === verseNumber.toString()) {
+                if (versesToHighlight.includes(parseInt(element.dataset.verseNumber))) {
                     element.classList.add('selected');
-                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    if (versesToHighlight[0] === parseInt(element.dataset.verseNumber)) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
                 } else {
                     element.classList.remove('selected');
                 }
