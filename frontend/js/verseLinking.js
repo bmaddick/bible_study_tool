@@ -19,6 +19,15 @@ class VerseLinkingService {
             // Set up event listeners before loading initial chapter
             this.setupEventListeners();
 
+            // Add event listener for displayChapter event
+            document.addEventListener('displayChapter', async (event) => {
+                console.log('Received displayChapter event:', event.detail);
+                const { book, chapter, highlightVerses } = event.detail;
+                console.log('Highlighting verses:', highlightVerses);
+                await this.displayChapter(book, chapter, highlightVerses);
+                console.log('Display chapter completed with highlighting');
+            });
+
             // Initialize chapter navigation and wait for completion
             await this.initializeChapterNavigation().catch(error => {
                 console.error('Error initializing chapter navigation:', error);
@@ -120,7 +129,12 @@ class VerseLinkingService {
         return relatedVerses;
     }
 
-    async displayChapter(book, chapter, highlightVerse = null) {
+    async displayChapter(book, chapter, highlightVerses = null) {
+        // Clear selected verses when changing chapters or searching
+        this.selectedVerses.clear();
+        // Update related verses display to show empty state
+        await this.updateRelatedVerses();
+
         this.currentBook = book;
         this.currentChapter = chapter;
 
@@ -138,31 +152,55 @@ class VerseLinkingService {
         // Clear existing content
         chapterContent.innerHTML = '';
 
+        // Convert highlightVerses to array if it's a single value
+        const versesToHighlight = highlightVerses ?
+            (Array.isArray(highlightVerses) ? highlightVerses : [highlightVerses]) : [];
+
         // Display verses with clickable verse numbers
         verses.forEach(verse => {
-            const verseElement = document.createElement('div');
-            verseElement.classList.add('verse-container');
-            const isHighlighted = highlightVerse && verse.verse.toString() === highlightVerse.toString();
+            // Create main verse container
+            const verseContainer = document.createElement('div');
+            verseContainer.classList.add('verse');
+            const verseNum = parseInt(verse.verse);
+            const isHighlighted = versesToHighlight.includes(verseNum);
             const isSelected = this.selectedVerses.has(`${book} ${chapter}:${verse.verse}`);
-            verseElement.innerHTML = `
-                <div class="verse">
-                    <span class="verse-number${isHighlighted || isSelected ? ' selected' : ''}"
-                          data-verse-number="${verse.verse}"
-                          data-verse-ref="${book} ${chapter}:${verse.verse}"
-                          role="button"
-                          tabindex="0"
-                          aria-label="Verse ${verse.verse}">${verse.verse}</span>
-                    <span class="verse-text" data-verse-ref="${book} ${chapter}:${verse.verse}">${verse.text}</span>
-                </div>
-            `;
-            chapterContent.appendChild(verseElement);
 
-            // Scroll to highlighted verse
-            if (isHighlighted) {
-                setTimeout(() => verseElement.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
+            // Create verse number element
+            const verseNumberElement = document.createElement('span');
+            verseNumberElement.classList.add('verse-number');
+            verseNumberElement.setAttribute('data-verse-number', verse.verse);
+            verseNumberElement.setAttribute('data-verse-ref', `${book} ${chapter}:${verse.verse}`);
+            verseNumberElement.setAttribute('role', 'button');
+            verseNumberElement.setAttribute('tabindex', '0');
+            verseNumberElement.setAttribute('aria-label', `Verse ${verse.verse}`);
+            verseNumberElement.textContent = verse.verse;
+
+            // Add highlighting class if verse is highlighted or selected
+            if (isHighlighted || isSelected) {
+                verseContainer.classList.add('highlighted');
+                verseNumberElement.classList.add('selected');
+            }
+
+            // Create verse text element
+            const verseTextElement = document.createElement('span');
+            verseTextElement.classList.add('verse-text');
+            verseTextElement.setAttribute('data-verse-ref', `${book} ${chapter}:${verse.verse}`);
+            verseTextElement.textContent = verse.text;
+
+            // Add elements to verse container
+            verseContainer.appendChild(verseNumberElement);
+            verseContainer.appendChild(verseTextElement);
+
+            // Add verse container to chapter content
+            chapterContent.appendChild(verseContainer);
+
+            // Scroll to first highlighted verse
+            if (isHighlighted && versesToHighlight[0] === verseNum) {
+                setTimeout(() => verseContainer.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
             }
         });
 
+        console.log(`Displayed chapter ${book} ${chapter} with highlights:`, versesToHighlight);
         // Update related verses display
         await this.updateRelatedVerses();
     }
