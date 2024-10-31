@@ -196,6 +196,11 @@ body {
     transition: all 0.2s ease;
 }
 
+.related-verse {
+    margin-bottom: 1rem; /* Adjust this value as needed for desired spacing */
+    padding-bottom: 0.5rem; /* Optional: adds space within the element itself */
+}
+
 .related-verses-section,
 .historical-context-section,
 .theological-insights-section {
