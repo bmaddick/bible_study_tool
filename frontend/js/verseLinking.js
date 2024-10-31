@@ -130,6 +130,11 @@ class VerseLinkingService {
     }
 
     async displayChapter(book, chapter, highlightVerses = null) {
+        // Clear selected verses when changing chapters or searching
+        this.selectedVerses.clear();
+        // Update related verses display to show empty state
+        await this.updateRelatedVerses();
+
         this.currentBook = book;
         this.currentChapter = chapter;
 
