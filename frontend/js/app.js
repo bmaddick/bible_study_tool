@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         // Initialize search functionality
         try {
-            const searchInit = initializeSearch(bibleService, verseLinkingService);
+            const searchInit = initializeSearch(bibleService);
             if (searchInit && typeof searchInit.then === 'function') {
                 await searchInit;
             }
@@ -39,8 +39,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Set up chapter display event handler
         document.addEventListener('displayChapter', async (event) => {
             try {
-                const { book, chapter, highlightVerses } = event.detail;
-                await verseLinkingService.displayChapter(book, chapter, highlightVerses);
+                const { book, chapter, highlightVerse } = event.detail;
+                await verseLinkingService.displayChapter(book, chapter, highlightVerse);
             } catch (error) {
                 console.error('Error displaying chapter:', error);
                 errorContainer.innerHTML = `
