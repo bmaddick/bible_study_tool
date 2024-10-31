@@ -31,11 +31,7 @@ export class BibleService {
         // Match patterns for different formats
         const patterns = [
             /^((?:First|Second|Third|[123])\s+)?([A-Za-z]+)\s+(\d+):(\d+)(?:-(\d+))?$/,
-            /^([A-Za-z]+)\s+(\d+):(\d+)(?:-(\d+))?$/,
-            /^((?:First|Second|Third|[123])\s+)?([A-Za-z]+)\s+(\d+)$/,
-            /^([A-Za-z]+)\s+(\d+)$/,
-            /^((?:First|Second|Third|[123])\s+)?([A-Za-z]+)$/,
-            /^([A-Za-z]+)$/
+            /^([A-Za-z]+)\s+(\d+):(\d+)(?:-(\d+))?$/
         ];
 
         let match = null;
@@ -51,41 +47,18 @@ export class BibleService {
 
         // Extract components based on match pattern
         const [_, prefix, bookName, chapter, startVerse, endVerse] = match;
-        const book = prefix ? `${prefix}${bookName}` : (bookName || _);
-        const references = [];
+        const book = prefix ? `${prefix}${bookName}` : bookName;
+        const start = parseInt(startVerse);
+        const end = endVerse ? parseInt(endVerse) : start;
 
-        // Handle chapter-only and book-only references
-        if (!chapter) {
-            // Book-only reference, default to chapter 1
-            references.push({
-                book,
-                chapter: 1,
-                verse: 1,
-                reference: `${book} 1:1`,
-                isBookOnly: true
-            });
-        } else if (!startVerse) {
+        const references = [];
+        for (let verse = start; verse <= end; verse++) {
             references.push({
                 book,
                 chapter: parseInt(chapter),
-                verse: 1,
-                reference: `${book} ${chapter}:1`,
-                isChapterOnly: true
+                verse,
+                reference: `${book} ${chapter}:${verse}`
             });
-        } else {
-            // Handle verse-specific references
-            const start = parseInt(startVerse);
-            const end = endVerse ? parseInt(endVerse) : start;
-
-            for (let verse = start; verse <= end; verse++) {
-                references.push({
-                    book,
-                    chapter: parseInt(chapter),
-                    verse,
-                    reference: `${book} ${chapter}:${verse}`,
-                    isChapterOnly: false
-                });
-            }
         }
 
         console.log(`Parsed references:`, references);
@@ -280,7 +253,7 @@ export class BibleService {
         console.log(`Getting chapter: ${book} ${chapter}`);
 
         const results = Array.from(this.verseIndex.values())
-            .filter(verse => this.normalizeBookName(verse.book_name) === this.normalizeBookName(book) && verse.chapter === parseInt(chapter))
+            .filter(verse => verse.book_name === book && verse.chapter === parseInt(chapter))
             .sort((a, b) => a.verse - b.verse);
 
         console.log(`Found ${results.length} verses in ${book} ${chapter}`);

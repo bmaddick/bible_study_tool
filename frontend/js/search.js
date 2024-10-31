@@ -1,4 +1,4 @@
-export function initializeSearch(bibleService, verseLinkingService) {
+export function initializeSearch(bibleService) {
     return new Promise((resolve, reject) => {
         const searchInput = document.getElementById('verse-search');
         const searchButton = document.getElementById('search-button');
@@ -13,72 +13,21 @@ export function initializeSearch(bibleService, verseLinkingService) {
         async function searchBible(query) {
             try {
                 searchError.style.display = 'none';
-                if (!query || typeof query !== 'string') {
-                    throw new Error('Please enter a valid verse reference');
-                }
-
-                // Clean and normalize the input
-                const cleanQuery = query.trim().replace(/\s+/g, ' ');
-
-                // Initialize variables
-                let book, chapter, verseStart, verseEnd;
-
-                // Handle book-only reference (e.g., "John")
-                if (!cleanQuery.includes(' ')) {
-                    book = cleanQuery;
-                    chapter = 1;
-                    verseStart = 1;
-                    verseEnd = 1;
+                const verse = await bibleService.getVerse(query);
+                if (verse) {
+                    // If exact verse reference found, display it
+                    const [book, chapter] = verse.reference.split(' ');
+                    document.dispatchEvent(new CustomEvent('displayChapter', {
+                        detail: { book, chapter: parseInt(chapter), highlightVerse: verse.verse }
+                    }));
                 } else {
-                    // Handle references with spaces
-                    const parts = cleanQuery.split(':');
-                    const beforeColon = parts[0].trim();
-                    const spaceParts = beforeColon.split(' ');
-
-                    // Extract book and chapter
-                    chapter = parseInt(spaceParts[spaceParts.length - 1]);
-                    book = spaceParts.slice(0, -1).join(' ');
-
-                    if (parts.length === 1) {
-                        // Chapter-only reference (e.g., "John 3")
-                        verseStart = 1;
-                        verseEnd = 1;
-                    } else {
-                        // Verse reference (e.g., "John 3:16" or "John 3:16-20")
-                        const verseParts = parts[1].split('-');
-                        verseStart = parseInt(verseParts[0]);
-                        verseEnd = verseParts.length > 1 ? parseInt(verseParts[1]) : verseStart;
-                    }
-                }
-
-                if (!book) {
-                    throw new Error('Please enter a valid book name');
-                }
-
-                try {
-                    // Construct query for BibleService
-                    const formattedQuery = `${book} ${chapter}:${verseStart}${verseEnd !== verseStart ? `-${verseEnd}` : ''}`;
-                    const verses = await bibleService.getVerse(formattedQuery);
-
-                    if (verses) {
-                        const verseArray = Array.isArray(verses) ? verses : [verses];
-                        const highlightVerses = verseArray.map(v => parseInt(v.verse));
-
-                        document.dispatchEvent(new CustomEvent('displayChapter', {
-                            detail: {
-                                book,
-                                chapter,
-                                highlightVerses
-                            }
-                        }));
-                    }
-                } catch (error) {
-                    console.error('Error fetching verses:', error);
-                    throw new Error('Error fetching Bible content. Please check your reference and try again.');
+                    // If no exact match, search for verses containing the text
+                    const results = await bibleService.searchVerses(query);
+                    displayResults(results);
                 }
             } catch (error) {
                 console.error('Error searching Bible:', error);
-                searchError.textContent = error.message || 'Error searching Bible content. Please try again later.';
+                searchError.textContent = 'Error searching Bible content. Please try again later.';
                 searchError.style.display = 'block';
             }
         }
@@ -99,7 +48,7 @@ export function initializeSearch(bibleService, verseLinkingService) {
                 detail: {
                     book,
                     chapter: parseInt(chapter),
-                    highlightVerses: [firstResult.verse]
+                    highlightVerse: firstResult.verse
                 }
             }));
 
@@ -120,23 +69,14 @@ export function initializeSearch(bibleService, verseLinkingService) {
             }
         }
 
-        function highlightVerse(verseNumbers) {
-            const verseElements = document.querySelectorAll('[data-verse-number]');
-            const versesToHighlight = Array.isArray(verseNumbers) ? verseNumbers : [verseNumbers];
-
-            // Remove all existing highlights first
+        function highlightVerse(verseNumber) {
+            const verseElements = document.querySelectorAll('.verse-number');
             verseElements.forEach(element => {
-                element.classList.remove('selected');
-            });
-
-            // Add highlights to specified verses
-            verseElements.forEach(element => {
-                const verseNum = parseInt(element.dataset.verseNumber);
-                if (versesToHighlight.includes(verseNum)) {
+                if (element.dataset.verseNumber === verseNumber.toString()) {
                     element.classList.add('selected');
-                    if (verseNum === versesToHighlight[0]) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
+                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    element.classList.remove('selected');
                 }
             });
         }
