@@ -89,4 +89,5 @@ class DisplayService {
 
 // Create and export singleton instance
 const displayService = new DisplayService();
-export { displayService as DisplayService };
+export { DisplayService };  // Export the class
+export { displayService }; // Export the singleton instance
