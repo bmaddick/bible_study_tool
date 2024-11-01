@@ -1,6 +1,27 @@
 // Service for displaying Bible verses with proper HTML structure
-export class DisplayService {
-    static createVerseElement(verse) {
+class DisplayService {
+    constructor() {
+        if (DisplayService.instance) {
+            return DisplayService.instance;
+        }
+        this.initialized = false;
+        DisplayService.instance = this;
+        console.log('DisplayService instance created');
+    }
+
+    initialize() {
+        if (this.initialized) {
+            console.log('DisplayService already initialized');
+            return Promise.resolve();
+        }
+
+        console.log('Initializing DisplayService...');
+        this.initialized = true;
+        return Promise.resolve();
+    }
+
+    createVerseElement(verse) {
+        console.log('Creating verse element:', verse);
         const verseContainer = document.createElement('div');
         verseContainer.className = 'verse';
         verseContainer.dataset.reference = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
@@ -29,6 +50,7 @@ export class DisplayService {
 
         // Add highlighting if specified
         if (verse.isHighlighted || verse.highlighted) {
+            console.log('Highlighting verse:', verse.verse);
             verseContainer.classList.add('verse-highlighted');
             verseNumberSpan.classList.add('highlighted');
         }
@@ -42,7 +64,8 @@ export class DisplayService {
         return verseContainer;
     }
 
-    static displaySearchResults(results, container) {
+    displaySearchResults(results, container) {
+        console.log('Displaying search results:', results.length);
         container.innerHTML = '';
         if (results.length === 0) {
             container.textContent = 'No verses found.';
@@ -55,9 +78,14 @@ export class DisplayService {
         });
     }
 
-    static displayVerse(verse, container) {
+    displayVerse(verse, container) {
+        console.log('Displaying single verse:', verse);
         container.innerHTML = '';
         const verseElement = this.createVerseElement(verse);
         container.appendChild(verseElement);
     }
 }
+
+// Create and export singleton instance
+const displayService = new DisplayService();
+export { displayService as DisplayService };
