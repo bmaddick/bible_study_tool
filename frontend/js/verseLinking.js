@@ -138,13 +138,24 @@ class VerseLinkingService {
         // Clear existing content
         chapterContent.innerHTML = '';
 
+        // Get highlighted verse numbers if range is provided
+        const highlightedVerses = [];
+        if (highlightVerse && highlightVerse.includes('-')) {
+            const [start, end] = highlightVerse.split('-').map(Number);
+            for (let i = start; i <= end; i++) {
+                highlightedVerses.push(i);
+            }
+        } else if (highlightVerse) {
+            highlightedVerses.push(Number(highlightVerse));
+        }
+
         // Display verses with clickable verse numbers using global DisplayService
         verses.forEach(verse => {
             const verseElement = window.displayService.createVerseElement({
                 ...verse,
                 book_name: book,
                 chapter: chapter,
-                isHighlighted: highlightVerse && verse.verse.toString() === highlightVerse.toString(),
+                isHighlighted: highlightedVerses.includes(verse.verse),
                 isSelected: this.selectedVerses.has(`${book} ${chapter}:${verse.verse}`)
             });
 
@@ -158,8 +169,8 @@ class VerseLinkingService {
 
             chapterContent.appendChild(verseElement);
 
-            // Scroll to highlighted verse
-            if (highlightVerse && verse.verse.toString() === highlightVerse.toString()) {
+            // Scroll to first highlighted verse
+            if (highlightedVerses.includes(verse.verse)) {
                 setTimeout(() => verseElement.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
             }
         });
