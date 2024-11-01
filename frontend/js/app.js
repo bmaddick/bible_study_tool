@@ -23,8 +23,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         window.bibleService = bibleService;
 
         // Initialize DisplayService and make it available globally
-        await DisplayService.initialize();
-        window.displayService = DisplayService;
+        const displayService = new DisplayService();
+        await displayService.initialize();
+        window.displayService = displayService;
 
         // Initialize verse linking service with DisplayService
         const verseLinkingService = new VerseLinkingService(bibleService);
