@@ -179,7 +179,7 @@ class VerseLinkingService {
             });
 
             // Create verse element using DisplayService
-            const verseElement = window.displayService.createVerseElement({
+            const verseElement = displayService.createVerseElement({
                 ...verseData,
                 text: verse.text,
                 verse: verse.verse,
