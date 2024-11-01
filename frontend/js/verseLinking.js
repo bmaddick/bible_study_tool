@@ -1,7 +1,9 @@
 // verseLinking.js - Handles verse selection and related verse display functionality
+import { DisplayService } from './displayService.js';
 
 class VerseLinkingService {
     constructor(bibleService) {
+        console.log('Initializing VerseLinkingService...');
         this.bibleService = bibleService;
         this.selectedVerses = new Set();
         this.currentChapter = null;
@@ -15,6 +17,12 @@ class VerseLinkingService {
                 throw new Error('BibleService not provided to VerseLinkingService');
             }
             await this.bibleService.initialize();
+
+            // Ensure DisplayService is available
+            if (!window.displayService) {
+                console.error('DisplayService not available');
+                throw new Error('DisplayService not available');
+            }
 
             // Set up event listeners before loading initial chapter
             this.setupEventListeners();
@@ -149,15 +157,25 @@ class VerseLinkingService {
             highlightedVerses.push(Number(highlightVerse));
         }
 
-        // Display verses with clickable verse numbers using global DisplayService
+        console.log('Rendering verses with highlighting:', { book, chapter, highlightedVerses });
+
+        // Display verses with clickable verse numbers using DisplayService
         verses.forEach(verse => {
-            const verseElement = window.displayService.createVerseElement({
+            const verseData = {
                 ...verse,
                 book_name: book,
                 chapter: chapter,
                 isHighlighted: highlightedVerses.includes(verse.verse),
                 isSelected: this.selectedVerses.has(`${book} ${chapter}:${verse.verse}`)
+            };
+
+            console.log('Creating verse element:', {
+                verse: verse.verse,
+                isHighlighted: verseData.isHighlighted,
+                isSelected: verseData.isSelected
             });
+
+            const verseElement = window.displayService.createVerseElement(verseData);
 
             // Add click handling attributes
             const verseNumber = verseElement.querySelector('.verse-number');
@@ -170,7 +188,7 @@ class VerseLinkingService {
             chapterContent.appendChild(verseElement);
 
             // Scroll to first highlighted verse
-            if (highlightedVerses.includes(verse.verse)) {
+            if (verseData.isHighlighted) {
                 setTimeout(() => verseElement.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
             }
         });
