@@ -54,8 +54,6 @@ class DisplayService {
         if (verse.isHighlighted || verse.highlighted) {
             console.log('Highlighting verse:', verse.verse);
             verseContainer.classList.add('verse-highlighted');
-            verseContentDiv.classList.add('verse-content-highlighted');
-            verseNumberDiv.classList.add('verse-number-highlighted');
         }
 
         // Add selection class if specified
