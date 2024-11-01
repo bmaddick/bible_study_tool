@@ -33,13 +33,15 @@ export function initializeSearch(bibleService) {
 
                         // Add highlighting to verses after they're displayed
                         setTimeout(() => {
-                            const verseElements = document.querySelectorAll('[data-verse-number]');
+                            const verseElements = document.querySelectorAll('.verse');
                             verseElements.forEach(element => {
-                                const verseNum = parseInt(element.getAttribute('data-verse-number'));
-                                if (highlightedVerses.includes(verseNum)) {
-                                    const verseContainer = element.closest('.verse') || element.parentElement;
-                                    verseContainer.classList.add('verse-highlighted');
-                                    verseContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                const verseNumber = element.querySelector('.verse-number');
+                                if (verseNumber) {
+                                    const verseNum = parseInt(verseNumber.getAttribute('data-verse-number'));
+                                    if (highlightedVerses.includes(verseNum)) {
+                                        element.classList.add('verse-highlighted');
+                                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    }
                                 }
                             });
                         }, 100);
@@ -57,12 +59,12 @@ export function initializeSearch(bibleService) {
 
                         // Add highlighting to single verse
                         setTimeout(() => {
-                            const verseElements = document.querySelectorAll('[data-verse-number]');
+                            const verseElements = document.querySelectorAll('.verse');
                             verseElements.forEach(element => {
-                                if (element.getAttribute('data-verse-number') === verses.verse.toString()) {
-                                    const verseContainer = element.closest('.verse') || element.parentElement;
-                                    verseContainer.classList.add('verse-highlighted');
-                                    verseContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                const verseNumber = element.querySelector('.verse-number');
+                                if (verseNumber && verseNumber.getAttribute('data-verse-number') === verses.verse.toString()) {
+                                    element.classList.add('verse-highlighted');
+                                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                 }
                             });
                         }, 100);
