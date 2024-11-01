@@ -12,21 +12,46 @@
 }
 
 .verse {
-    display: block;
+    display: flex;
+    align-items: flex-start;
     margin: 4px 0;
     padding: 2px 0;
+}
+
+.verse-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
 }
 
 .verse-number {
     font-weight: bold;
     margin-right: 8px;
     color: #666;
+    min-width: 24px;
+    text-align: right;
 }
 
 .verse-number[data-verse-number] {
     cursor: pointer;
 }
 
+.verse-reference {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 2px;
+}
+
 .verse-text {
     margin-left: 4px;
+}
+
+.verse.verse-highlighted .verse-content {
+    background-color: #ffeb3b;
+    border-radius: 2px;
+    padding: 2px 4px;
+}
+
+.verse.verse-highlighted:hover .verse-content {
+    background-color: #ffd700;
 }
