@@ -1,14 +1,17 @@
 // Service for displaying Bible verses with proper HTML structure
 export class DisplayService {
     static createVerseElement(verse) {
-        const verseElement = document.createElement('div');
-        verseElement.className = 'verse';
-        verseElement.dataset.reference = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
+        const verseContainer = document.createElement('div');
+        verseContainer.className = 'verse';
+        verseContainer.dataset.reference = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
 
         const verseNumberSpan = document.createElement('span');
         verseNumberSpan.className = 'verse-number';
         verseNumberSpan.setAttribute('data-verse-number', verse.verse.toString());
         verseNumberSpan.textContent = verse.verse;
+
+        const verseContentDiv = document.createElement('div');
+        verseContentDiv.className = 'verse-content';
 
         const referenceSpan = document.createElement('span');
         referenceSpan.className = 'verse-reference';
@@ -18,11 +21,13 @@ export class DisplayService {
         textSpan.className = 'verse-text';
         textSpan.textContent = verse.text;
 
-        verseElement.appendChild(verseNumberSpan);
-        verseElement.appendChild(referenceSpan);
-        verseElement.appendChild(textSpan);
+        verseContentDiv.appendChild(referenceSpan);
+        verseContentDiv.appendChild(textSpan);
 
-        return verseElement;
+        verseContainer.appendChild(verseNumberSpan);
+        verseContainer.appendChild(verseContentDiv);
+
+        return verseContainer;
     }
 
     static displaySearchResults(results, container) {
