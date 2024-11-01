@@ -216,55 +216,31 @@ export class BibleService {
             const parsedRefs = this.parseReference(reference);
             console.log(`Parsed ${parsedRefs.length} references for range: ${reference}`);
             const verses = [];
+            let highlightedVerseNumbers = new Set();
 
+            // First, collect all verse numbers that should be highlighted
             for (const ref of parsedRefs) {
-                console.log(`Processing reference: ${ref.reference}`);
-
-                if (ref.showFullChapter) {
-                    // Get all verses in the chapter
-                    const chapterVerses = await this.getChapter(ref.book, ref.chapter);
-                    verses.push(...chapterVerses.map(verse => ({
-                        ...verse,
-                        reference: `${ref.book} ${ref.chapter}:${verse.verse}`,
-                        isHighlighted: false
-                    })));
-                } else {
-                    // Create canonical reference format using the same normalization as buildVerseIndex
-                    const normalizedBookName = this.normalizeBookName(ref.book);
-                    const canonicalReference = `${normalizedBookName} ${ref.chapter}:${ref.verse}`;
-                    console.log(`Looking for canonical reference: ${canonicalReference}`);
-
-                    // Look up verse directly using canonical reference
-                    const verse = this.verseIndex.get(canonicalReference);
-
-                    if (!verse) {
-                        console.warn(`Verse not found: ${canonicalReference}`);
-                        throw new Error(`Verse not found: ${ref.reference}. Please check the book name, chapter, and verse number.`);
-                    }
-
-                    console.log(`Found verse: ${canonicalReference}`);
-                    verses.push({
-                        ...verse,
-                        reference: canonicalReference,
-                        isHighlighted: true
-                    });
+                if (!ref.showFullChapter) {
+                    highlightedVerseNumbers.add(ref.verse);
                 }
             }
 
-            // For verse ranges, get the full chapter and mark specified verses as highlighted
-            if (verses.some(v => v.isHighlighted)) {
-                const firstVerse = verses[0];
-                const chapterVerses = await this.getChapter(firstVerse.book_name, firstVerse.chapter);
-                const highlightedVerseNumbers = verses.map(v => v.verse);
+            // Get the full chapter from the first reference
+            const firstRef = parsedRefs[0];
+            const chapterVerses = await this.getChapter(firstRef.book, firstRef.chapter);
 
-                return chapterVerses.map(verse => ({
+            // Map the verses and set highlighting based on verse numbers
+            return chapterVerses.map(verse => {
+                const normalizedBookName = this.normalizeBookName(verse.book_name);
+                return {
                     ...verse,
-                    reference: `${verse.book_name} ${verse.chapter}:${verse.verse}`,
-                    isHighlighted: highlightedVerseNumbers.includes(verse.verse)
-                }));
-            }
+                    reference: `${normalizedBookName} ${verse.chapter}:${verse.verse}`,
+                    isHighlighted: highlightedVerseNumbers.size > 0 ?
+                        highlightedVerseNumbers.has(verse.verse) :
+                        false
+                };
+            });
 
-            return verses;
         } catch (error) {
             console.warn('Verse lookup error:', error.message);
             throw error;
