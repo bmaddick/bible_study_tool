@@ -178,14 +178,21 @@ class VerseLinkingService {
                 isSelected: verseData.isSelected
             });
 
-            const verseElement = window.displayService.createVerseElement(verseData);
+            // Create verse element using DisplayService
+            const verseElement = window.displayService.createVerseElement({
+                ...verseData,
+                text: verse.text,
+                verse: verse.verse,
+                reference: `${book} ${chapter}:${verse.verse}`
+            });
 
-            // Add click handling attributes
+            // Add click handling attributes to verse number
             const verseNumber = verseElement.querySelector('.verse-number');
             if (verseNumber) {
                 verseNumber.setAttribute('role', 'button');
                 verseNumber.setAttribute('tabindex', '0');
                 verseNumber.setAttribute('data-verse-ref', `${book} ${chapter}:${verse.verse}`);
+                verseNumber.setAttribute('data-verse-number', verse.verse.toString());
             }
 
             chapterContent.appendChild(verseElement);
