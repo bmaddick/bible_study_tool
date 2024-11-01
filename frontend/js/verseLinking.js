@@ -142,14 +142,30 @@ class VerseLinkingService {
 
         // Get chapter content from BibleService with highlighting
         let verses;
+        let highlightedVerseNumbers = [];
+
         if (highlightVerse) {
-            // If highlighting is needed, use getVerse to get the full chapter with highlighting
-            const reference = highlightVerse.includes('-')
-                ? `${book} ${chapter}:${highlightVerse}`
-                : `${book} ${chapter}:${highlightVerse}`;
-            verses = await this.bibleService.getVerse(reference);
+            // Parse verse range if present
+            if (highlightVerse.includes('-')) {
+                const [start, end] = highlightVerse.split('-').map(Number);
+                highlightedVerseNumbers = Array.from(
+                    { length: end - start + 1 },
+                    (_, i) => start + i
+                );
+            } else {
+                highlightedVerseNumbers = [Number(highlightVerse)];
+            }
+
+            // Get the full chapter first
+            verses = await this.bibleService.getChapter(book, chapter);
+
+            // Mark verses for highlighting
+            verses = verses.map(verse => ({
+                ...verse,
+                isHighlighted: highlightedVerseNumbers.includes(verse.verse)
+            }));
         } else {
-            // Otherwise, just get the chapter
+            // Otherwise, just get the chapter without highlighting
             verses = await this.bibleService.getChapter(book, chapter);
         }
 
