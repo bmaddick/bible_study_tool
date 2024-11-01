@@ -138,27 +138,31 @@ class VerseLinkingService {
         // Clear existing content
         chapterContent.innerHTML = '';
 
+        // Import DisplayService if not already imported
+        const { DisplayService } = await import('./displayService.js');
+
         // Display verses with clickable verse numbers
         verses.forEach(verse => {
-            const verseElement = document.createElement('div');
-            verseElement.classList.add('verse-container');
-            const isHighlighted = highlightVerse && verse.verse.toString() === highlightVerse.toString();
-            const isSelected = this.selectedVerses.has(`${book} ${chapter}:${verse.verse}`);
-            verseElement.innerHTML = `
-                <div class="verse">
-                    <span class="verse-number${isHighlighted || isSelected ? ' selected' : ''}"
-                          data-verse-number="${verse.verse}"
-                          data-verse-ref="${book} ${chapter}:${verse.verse}"
-                          role="button"
-                          tabindex="0"
-                          aria-label="Verse ${verse.verse}">${verse.verse}</span>
-                    <span class="verse-text" data-verse-ref="${book} ${chapter}:${verse.verse}">${verse.text}</span>
-                </div>
-            `;
+            const verseElement = DisplayService.createVerseElement({
+                ...verse,
+                book_name: book,
+                chapter: chapter,
+                isHighlighted: highlightVerse && verse.verse.toString() === highlightVerse.toString(),
+                isSelected: this.selectedVerses.has(`${book} ${chapter}:${verse.verse}`)
+            });
+
+            // Add click handling attributes
+            const verseNumber = verseElement.querySelector('.verse-number');
+            if (verseNumber) {
+                verseNumber.setAttribute('role', 'button');
+                verseNumber.setAttribute('tabindex', '0');
+                verseNumber.setAttribute('data-verse-ref', `${book} ${chapter}:${verse.verse}`);
+            }
+
             chapterContent.appendChild(verseElement);
 
             // Scroll to highlighted verse
-            if (isHighlighted) {
+            if (highlightVerse && verse.verse.toString() === highlightVerse.toString()) {
                 setTimeout(() => verseElement.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
             }
         });
