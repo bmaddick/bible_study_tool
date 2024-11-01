@@ -27,6 +27,11 @@ export class DisplayService {
         verseContainer.appendChild(verseNumberSpan);
         verseContainer.appendChild(verseContentDiv);
 
+        // Add highlighting if specified
+        if (verse.isHighlighted) {
+            verseContainer.classList.add('verse-highlighted');
+        }
+
         return verseContainer;
     }
 

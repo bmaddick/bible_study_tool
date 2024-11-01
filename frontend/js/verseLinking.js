@@ -138,12 +138,9 @@ class VerseLinkingService {
         // Clear existing content
         chapterContent.innerHTML = '';
 
-        // Import DisplayService if not already imported
-        const { DisplayService } = await import('./displayService.js');
-
-        // Display verses with clickable verse numbers
+        // Display verses with clickable verse numbers using global DisplayService
         verses.forEach(verse => {
-            const verseElement = DisplayService.createVerseElement({
+            const verseElement = window.displayService.createVerseElement({
                 ...verse,
                 book_name: book,
                 chapter: chapter,
