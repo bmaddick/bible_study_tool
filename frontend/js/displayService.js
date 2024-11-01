@@ -25,40 +25,43 @@ class DisplayService {
         const verseContainer = document.createElement('div');
         verseContainer.className = 'verse';
         verseContainer.dataset.reference = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
+        verseContainer.dataset.verseNumber = verse.verse.toString();
 
-        const verseNumberSpan = document.createElement('span');
-        verseNumberSpan.className = 'verse-number';
-        verseNumberSpan.setAttribute('data-verse-number', verse.verse.toString());
-        verseNumberSpan.textContent = verse.verse;
+        const verseNumberDiv = document.createElement('div');
+        verseNumberDiv.className = 'verse-number';
+        verseNumberDiv.setAttribute('data-verse-number', verse.verse.toString());
+        verseNumberDiv.setAttribute('tabindex', '0');
+        verseNumberDiv.textContent = verse.verse;
 
         const verseContentDiv = document.createElement('div');
         verseContentDiv.className = 'verse-content';
 
-        const referenceSpan = document.createElement('span');
-        referenceSpan.className = 'verse-reference';
-        referenceSpan.textContent = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
+        const referenceDiv = document.createElement('div');
+        referenceDiv.className = 'verse-reference';
+        referenceDiv.textContent = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
 
-        const textSpan = document.createElement('span');
-        textSpan.className = 'verse-text';
-        textSpan.textContent = verse.text;
+        const textDiv = document.createElement('div');
+        textDiv.className = 'verse-text';
+        textDiv.textContent = verse.text;
 
-        verseContentDiv.appendChild(referenceSpan);
-        verseContentDiv.appendChild(textSpan);
+        verseContentDiv.appendChild(referenceDiv);
+        verseContentDiv.appendChild(textDiv);
 
-        verseContainer.appendChild(verseNumberSpan);
+        verseContainer.appendChild(verseNumberDiv);
         verseContainer.appendChild(verseContentDiv);
 
         // Add highlighting if specified
         if (verse.isHighlighted || verse.highlighted) {
             console.log('Highlighting verse:', verse.verse);
             verseContainer.classList.add('verse-highlighted');
-            verseNumberSpan.classList.add('highlighted');
+            verseContentDiv.classList.add('verse-content-highlighted');
+            verseNumberDiv.classList.add('verse-number-highlighted');
         }
 
         // Add selection class if specified
         if (verse.isSelected) {
             verseContainer.classList.add('selected');
-            verseNumberSpan.classList.add('selected');
+            verseNumberDiv.classList.add('selected');
         }
 
         return verseContainer;
