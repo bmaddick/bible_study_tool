@@ -28,8 +28,15 @@ export class DisplayService {
         verseContainer.appendChild(verseContentDiv);
 
         // Add highlighting if specified
-        if (verse.isHighlighted) {
+        if (verse.isHighlighted || verse.highlighted) {
             verseContainer.classList.add('verse-highlighted');
+            verseNumberSpan.classList.add('highlighted');
+        }
+
+        // Add selection class if specified
+        if (verse.isSelected) {
+            verseContainer.classList.add('selected');
+            verseNumberSpan.classList.add('selected');
         }
 
         return verseContainer;
