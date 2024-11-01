@@ -3,8 +3,30 @@
     padding: 2px 4px;
     border-radius: 2px;
     transition: background-color 0.3s ease;
+    display: block;
+    margin: 4px 0;
 }
 
 .verse-highlighted:hover {
     background-color: #ffd700;
+}
+
+.verse {
+    display: block;
+    margin: 4px 0;
+    padding: 2px 0;
+}
+
+.verse-number {
+    font-weight: bold;
+    margin-right: 8px;
+    color: #666;
+}
+
+.verse-number[data-verse-number] {
+    cursor: pointer;
+}
+
+.verse-text {
+    margin-left: 4px;
 }
