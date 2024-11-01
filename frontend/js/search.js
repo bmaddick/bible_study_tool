@@ -30,6 +30,18 @@ export function initializeSearch(bibleService) {
                                 verses: verses
                             }
                         }));
+
+                        // Add highlighting to verses after they're displayed
+                        setTimeout(() => {
+                            const verseElements = document.querySelectorAll('.verse');
+                            verseElements.forEach(element => {
+                                const verseNum = parseInt(element.dataset.verseNumber);
+                                if (highlightedVerses.includes(verseNum)) {
+                                    element.classList.add('verse-highlighted');
+                                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            });
+                        }, 100);
                     } else {
                         // Handle single verse result (for backward compatibility)
                         const [book, chapter] = verses.reference.split(' ');
@@ -41,6 +53,17 @@ export function initializeSearch(bibleService) {
                                 verses: [verses]
                             }
                         }));
+
+                        // Add highlighting to single verse
+                        setTimeout(() => {
+                            const verseElements = document.querySelectorAll('.verse');
+                            verseElements.forEach(element => {
+                                if (element.dataset.verseNumber === verses.verse.toString()) {
+                                    element.classList.add('verse-highlighted');
+                                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            });
+                        }, 100);
                     }
                 } else {
                     // If no exact match, search for verses containing the text

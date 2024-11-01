@@ -1,0 +1,10 @@
+.verse-highlighted {
+    background-color: #ffeb3b;
+    padding: 2px 4px;
+    border-radius: 2px;
+    transition: background-color 0.3s ease;
+}
+
+.verse-highlighted:hover {
+    background-color: #ffd700;
+}
