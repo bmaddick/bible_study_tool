@@ -140,24 +140,27 @@ class VerseLinkingService {
         // Update chapter reference
         chapterReference.textContent = `${book} ${chapter}`;
 
-        // Get chapter content from BibleService
-        const verses = await this.bibleService.getChapter(book, chapter);
+        // Get chapter content from BibleService with highlighting
+        let verses;
+        if (highlightVerse) {
+            // If highlighting is needed, use getVerse to get the full chapter with highlighting
+            const reference = highlightVerse.includes('-')
+                ? `${book} ${chapter}:${highlightVerse}`
+                : `${book} ${chapter}:${highlightVerse}`;
+            verses = await this.bibleService.getVerse(reference);
+        } else {
+            // Otherwise, just get the chapter
+            verses = await this.bibleService.getChapter(book, chapter);
+        }
 
         // Clear existing content
         chapterContent.innerHTML = '';
 
-        // Get highlighted verse numbers if range is provided
-        const highlightedVerses = [];
-        if (highlightVerse && highlightVerse.includes('-')) {
-            const [start, end] = highlightVerse.split('-').map(Number);
-            for (let i = start; i <= end; i++) {
-                highlightedVerses.push(i);
-            }
-        } else if (highlightVerse) {
-            highlightedVerses.push(Number(highlightVerse));
-        }
-
-        console.log('Rendering verses with highlighting:', { book, chapter, highlightedVerses });
+        console.log('Rendering verses with highlighting:', {
+            book,
+            chapter,
+            highlightedVerses: verses.filter(v => v.isHighlighted).map(v => v.verse)
+        });
 
         // Display verses with clickable verse numbers using DisplayService
         verses.forEach(verse => {
@@ -165,7 +168,7 @@ class VerseLinkingService {
                 ...verse,
                 book_name: book,
                 chapter: chapter,
-                isHighlighted: highlightedVerses.includes(verse.verse),
+                isHighlighted: verse.isHighlighted || false,
                 isSelected: this.selectedVerses.has(`${book} ${chapter}:${verse.verse}`)
             };
 
