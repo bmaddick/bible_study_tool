@@ -1,0 +1,84 @@
+/* Base verse styles */
+.verse {
+    display: flex;
+    align-items: flex-start;
+    margin: 4px 0;
+    padding: 2px 0;
+    position: relative;
+}
+
+.verse-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 2px 4px;
+    border-radius: 2px;
+    transition: background-color 0.3s ease;
+}
+
+.verse-number {
+    font-weight: bold;
+    margin-right: 8px;
+    color: #666;
+    min-width: 24px;
+    text-align: right;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.verse-reference {
+    font-size: 0.9em;
+    color: #666;
+    margin-bottom: 2px;
+}
+
+.verse-text {
+    margin-left: 4px;
+}
+
+/* Highlighting styles */
+.verse.verse-highlighted .verse-content {
+    background-color: #ffeb3b;
+}
+
+.verse.verse-highlighted:hover .verse-content {
+    background-color: #ffd700;
+}
+
+.verse.verse-highlighted .verse-number {
+    color: #d4b400;
+}
+
+/* Selection styles */
+.verse.selected .verse-content {
+    background-color: #e3f2fd;
+}
+
+.verse.selected .verse-number {
+    color: #1976d2;
+}
+
+.verse.selected:hover .verse-content {
+    background-color: #bbdefb;
+}
+
+/* Interactive states */
+.verse-number:hover {
+    color: #333;
+}
+
+.verse-number:focus {
+    outline: 2px solid #2196f3;
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* Accessibility */
+.verse-number[tabindex="0"] {
+    outline: none;
+}
+
+.verse-number[tabindex="0"]:focus {
+    outline: 2px solid #2196f3;
+    outline-offset: 2px;
+}

@@ -13,13 +13,62 @@ export function initializeSearch(bibleService) {
         async function searchBible(query) {
             try {
                 searchError.style.display = 'none';
-                const verse = await bibleService.getVerse(query);
-                if (verse) {
-                    // If exact verse reference found, display it
-                    const [book, chapter] = verse.reference.split(' ');
-                    document.dispatchEvent(new CustomEvent('displayChapter', {
-                        detail: { book, chapter: parseInt(chapter), highlightVerse: verse.verse }
-                    }));
+                const verses = await bibleService.getVerse(query);
+                if (verses) {
+                    // Handle array of verses with highlighting information
+                    if (Array.isArray(verses)) {
+                        const firstVerse = verses[0];
+                        const highlightedVerses = verses
+                            .filter(v => v.isHighlighted)
+                            .map(v => v.verse);
+
+                        document.dispatchEvent(new CustomEvent('displayChapter', {
+                            detail: {
+                                book: firstVerse.book_name,
+                                chapter: parseInt(firstVerse.chapter),
+                                highlightVerses: highlightedVerses,
+                                verses: verses
+                            }
+                        }));
+
+                        // Add highlighting to verses after they're displayed
+                        setTimeout(() => {
+                            const verseElements = document.querySelectorAll('.verse');
+                            verseElements.forEach(element => {
+                                const verseNumber = element.querySelector('.verse-number');
+                                if (verseNumber) {
+                                    const verseNum = parseInt(verseNumber.getAttribute('data-verse-number'));
+                                    if (highlightedVerses.includes(verseNum)) {
+                                        element.classList.add('verse-highlighted');
+                                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    }
+                                }
+                            });
+                        }, 100);
+                    } else {
+                        // Handle single verse result (for backward compatibility)
+                        const [book, chapter] = verses.reference.split(' ');
+                        document.dispatchEvent(new CustomEvent('displayChapter', {
+                            detail: {
+                                book,
+                                chapter: parseInt(chapter),
+                                highlightVerses: [verses.verse],
+                                verses: [verses]
+                            }
+                        }));
+
+                        // Add highlighting to single verse
+                        setTimeout(() => {
+                            const verseElements = document.querySelectorAll('.verse');
+                            verseElements.forEach(element => {
+                                const verseNumber = element.querySelector('.verse-number');
+                                if (verseNumber && verseNumber.getAttribute('data-verse-number') === verses.verse.toString()) {
+                                    element.classList.add('verse-highlighted');
+                                    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                }
+                            });
+                        }, 100);
+                    }
                 } else {
                     // If no exact match, search for verses containing the text
                     const results = await bibleService.searchVerses(query);
@@ -48,7 +97,8 @@ export function initializeSearch(bibleService) {
                 detail: {
                     book,
                     chapter: parseInt(chapter),
-                    highlightVerse: firstResult.verse
+                    highlightVerses: [firstResult.verse],
+                    verses: results
                 }
             }));
 

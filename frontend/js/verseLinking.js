@@ -1,7 +1,9 @@
 // verseLinking.js - Handles verse selection and related verse display functionality
+import { displayService } from './displayService.js';
 
 class VerseLinkingService {
     constructor(bibleService) {
+        console.log('Initializing VerseLinkingService...');
         this.bibleService = bibleService;
         this.selectedVerses = new Set();
         this.currentChapter = null;
@@ -15,6 +17,12 @@ class VerseLinkingService {
                 throw new Error('BibleService not provided to VerseLinkingService');
             }
             await this.bibleService.initialize();
+
+            // Ensure DisplayService is available
+            if (!window.displayService) {
+                console.error('DisplayService not available');
+                throw new Error('DisplayService not available');
+            }
 
             // Set up event listeners before loading initial chapter
             this.setupEventListeners();
@@ -132,33 +140,81 @@ class VerseLinkingService {
         // Update chapter reference
         chapterReference.textContent = `${book} ${chapter}`;
 
-        // Get chapter content from BibleService
-        const verses = await this.bibleService.getChapter(book, chapter);
+        // Get chapter content from BibleService with highlighting
+        let verses;
+        let highlightedVerseNumbers = [];
+
+        if (highlightVerse) {
+            // Parse verse range if present
+            if (highlightVerse.includes('-')) {
+                const [start, end] = highlightVerse.split('-').map(Number);
+                highlightedVerseNumbers = Array.from(
+                    { length: end - start + 1 },
+                    (_, i) => start + i
+                );
+            } else {
+                highlightedVerseNumbers = [Number(highlightVerse)];
+            }
+
+            // Get the full chapter first
+            verses = await this.bibleService.getChapter(book, chapter);
+
+            // Mark verses for highlighting
+            verses = verses.map(verse => ({
+                ...verse,
+                isHighlighted: highlightedVerseNumbers.includes(verse.verse)
+            }));
+        } else {
+            // Otherwise, just get the chapter without highlighting
+            verses = await this.bibleService.getChapter(book, chapter);
+        }
 
         // Clear existing content
         chapterContent.innerHTML = '';
 
-        // Display verses with clickable verse numbers
+        console.log('Rendering verses with highlighting:', {
+            book,
+            chapter,
+            highlightedVerses: verses.filter(v => v.isHighlighted).map(v => v.verse)
+        });
+
+        // Display verses with clickable verse numbers using DisplayService
         verses.forEach(verse => {
-            const verseElement = document.createElement('div');
-            verseElement.classList.add('verse-container');
-            const isHighlighted = highlightVerse && verse.verse.toString() === highlightVerse.toString();
-            const isSelected = this.selectedVerses.has(`${book} ${chapter}:${verse.verse}`);
-            verseElement.innerHTML = `
-                <div class="verse">
-                    <span class="verse-number${isHighlighted || isSelected ? ' selected' : ''}"
-                          data-verse-number="${verse.verse}"
-                          data-verse-ref="${book} ${chapter}:${verse.verse}"
-                          role="button"
-                          tabindex="0"
-                          aria-label="Verse ${verse.verse}">${verse.verse}</span>
-                    <span class="verse-text" data-verse-ref="${book} ${chapter}:${verse.verse}">${verse.text}</span>
-                </div>
-            `;
+            const verseData = {
+                ...verse,
+                book_name: book,
+                chapter: chapter,
+                isHighlighted: verse.isHighlighted || false,
+                isSelected: this.selectedVerses.has(`${book} ${chapter}:${verse.verse}`)
+            };
+
+            console.log('Creating verse element:', {
+                verse: verse.verse,
+                isHighlighted: verseData.isHighlighted,
+                isSelected: verseData.isSelected
+            });
+
+            // Create verse element using DisplayService
+            const verseElement = displayService.createVerseElement({
+                ...verseData,
+                text: verse.text,
+                verse: verse.verse,
+                reference: `${book} ${chapter}:${verse.verse}`
+            });
+
+            // Add click handling attributes to verse number
+            const verseNumber = verseElement.querySelector('.verse-number');
+            if (verseNumber) {
+                verseNumber.setAttribute('role', 'button');
+                verseNumber.setAttribute('tabindex', '0');
+                verseNumber.setAttribute('data-verse-ref', `${book} ${chapter}:${verse.verse}`);
+                verseNumber.setAttribute('data-verse-number', verse.verse.toString());
+            }
+
             chapterContent.appendChild(verseElement);
 
-            // Scroll to highlighted verse
-            if (isHighlighted) {
+            // Scroll to first highlighted verse
+            if (verseData.isHighlighted) {
                 setTimeout(() => verseElement.scrollIntoView({ behavior: 'smooth', block: 'center' }), 100);
             }
         });

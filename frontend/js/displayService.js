@@ -1,25 +1,72 @@
 // Service for displaying Bible verses with proper HTML structure
-export class DisplayService {
-    static createVerseElement(verse) {
-        const verseElement = document.createElement('div');
-        verseElement.className = 'verse';
-        verseElement.dataset.reference = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
-
-        const referenceSpan = document.createElement('span');
-        referenceSpan.className = 'verse-reference';
-        referenceSpan.textContent = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
-
-        const textSpan = document.createElement('span');
-        textSpan.className = 'verse-text';
-        textSpan.textContent = verse.text;
-
-        verseElement.appendChild(referenceSpan);
-        verseElement.appendChild(textSpan);
-
-        return verseElement;
+class DisplayService {
+    constructor() {
+        if (DisplayService.instance) {
+            return DisplayService.instance;
+        }
+        this.initialized = false;
+        DisplayService.instance = this;
+        console.log('DisplayService instance created');
     }
 
-    static displaySearchResults(results, container) {
+    initialize() {
+        if (this.initialized) {
+            console.log('DisplayService already initialized');
+            return Promise.resolve();
+        }
+
+        console.log('Initializing DisplayService...');
+        this.initialized = true;
+        return Promise.resolve();
+    }
+
+    createVerseElement(verse) {
+        console.log('Creating verse element:', verse);
+        const verseContainer = document.createElement('div');
+        verseContainer.className = 'verse';
+        verseContainer.dataset.reference = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
+        verseContainer.dataset.verseNumber = verse.verse.toString();
+
+        const verseNumberDiv = document.createElement('div');
+        verseNumberDiv.className = 'verse-number';
+        verseNumberDiv.setAttribute('data-verse-number', verse.verse.toString());
+        verseNumberDiv.setAttribute('tabindex', '0');
+        verseNumberDiv.textContent = verse.verse;
+
+        const verseContentDiv = document.createElement('div');
+        verseContentDiv.className = 'verse-content';
+
+        const referenceDiv = document.createElement('div');
+        referenceDiv.className = 'verse-reference';
+        referenceDiv.textContent = `${verse.book_name} ${verse.chapter}:${verse.verse}`;
+
+        const textDiv = document.createElement('div');
+        textDiv.className = 'verse-text';
+        textDiv.textContent = verse.text;
+
+        verseContentDiv.appendChild(referenceDiv);
+        verseContentDiv.appendChild(textDiv);
+
+        verseContainer.appendChild(verseNumberDiv);
+        verseContainer.appendChild(verseContentDiv);
+
+        // Add highlighting if specified
+        if (verse.isHighlighted || verse.highlighted) {
+            console.log('Highlighting verse:', verse.verse);
+            verseContainer.classList.add('verse-highlighted');
+        }
+
+        // Add selection class if specified
+        if (verse.isSelected) {
+            verseContainer.classList.add('selected');
+            verseNumberDiv.classList.add('selected');
+        }
+
+        return verseContainer;
+    }
+
+    displaySearchResults(results, container) {
+        console.log('Displaying search results:', results.length);
         container.innerHTML = '';
         if (results.length === 0) {
             container.textContent = 'No verses found.';
@@ -32,90 +79,15 @@ export class DisplayService {
         });
     }
 
-    static displayVerse(verse, container) {
+    displayVerse(verse, container) {
+        console.log('Displaying single verse:', verse);
         container.innerHTML = '';
         const verseElement = this.createVerseElement(verse);
         container.appendChild(verseElement);
     }
 }
-```
 
-Now let's update the test-bible-new.html to use this display service.
-
-<edit_file file="/home/ubuntu/bible_study_tool/frontend/test-bible-new.html">
-```html
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Bible Service Test</title>
-    <link rel="stylesheet" href="css/styles.css">
-    <link rel="stylesheet" href="css/highlight-styles.css">
-</head>
-<body>
-    <h1>Bible Service Test</h1>
-
-    <div class="controls">
-        <input type="text" id="verseInput" placeholder="Enter verse (e.g., Genesis 1:1)">
-        <button id="lookupBtn">Look up verse</button>
-
-        <input type="text" id="searchInput" placeholder="Search text">
-        <button id="searchBtn">Search</button>
-    </div>
-
-    <div id="results"></div>
-
-    <div id="highlightToolbar" class="highlight-toolbar" style="display: none;">
-        <button class="highlight-btn">Highlight</button>
-        <button class="meaning-btn">Get Meaning</button>
-        <button class="related-btn">Find Related</button>
-    </div>
-
-    <script type="module">
-        import { BibleService } from './js/bibleService.js';
-        import { HighlightService } from './js/highlightService.js';
-        import { DisplayService } from './js/displayService.js';
-
-        const bibleService = new BibleService();
-        const highlightService = new HighlightService();
-        const resultsContainer = document.getElementById('results');
-
-        // Initialize services
-        async function init() {
-            try {
-                await bibleService.initialize();
-                highlightService.initialize();
-                document.getElementById('lookupBtn').disabled = false;
-                document.getElementById('searchBtn').disabled = false;
-            } catch (error) {
-                console.error('Initialization error:', error);
-                resultsContainer.textContent = 'Error initializing Bible service: ' + error.message;
-            }
-        }
-
-        // Verse lookup
-        document.getElementById('lookupBtn').addEventListener('click', async () => {
-            const reference = document.getElementById('verseInput').value;
-            try {
-                const verse = await bibleService.getVerse(reference);
-                DisplayService.displayVerse(verse, resultsContainer);
-            } catch (error) {
-                resultsContainer.textContent = error.message;
-            }
-        });
-
-        // Search
-        document.getElementById('searchBtn').addEventListener('click', async () => {
-            const query = document.getElementById('searchInput').value;
-            try {
-                const results = await bibleService.searchVerses(query);
-                DisplayService.displaySearchResults(results, resultsContainer);
-            } catch (error) {
-                resultsContainer.textContent = error.message;
-            }
-        });
-
-        // Initialize on page load
-        init();
-    </script>
-</body>
-</html>
+// Create and export singleton instance
+const displayService = new DisplayService();
+export { DisplayService };  // Export the class
+export { displayService }; // Export the singleton instance

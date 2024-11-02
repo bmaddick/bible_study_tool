@@ -5,6 +5,7 @@ import { initializeSearch } from './search.js';
 import { initializeAI } from './ai.js';
 import VerseLinkingService from './verseLinking.js';
 import { BibleService } from './bibleService.js';
+import { DisplayService, displayService } from './displayService.js';
 
 // Initialize all modules when DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
@@ -21,7 +22,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Make bibleService available globally for debugging
         window.bibleService = bibleService;
 
-        // Initialize verse linking service
+        // Initialize DisplayService and make it available globally
+        await displayService.initialize();
+        window.displayService = displayService;
+
+        // Initialize verse linking service with DisplayService
         const verseLinkingService = new VerseLinkingService(bibleService);
         await verseLinkingService.initialize();
 
