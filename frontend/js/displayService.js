@@ -44,7 +44,7 @@ class DisplayService {
         textDiv.className = 'verse-text';
         textDiv.textContent = verse.text;
 
-        verseContentDiv.appendChild(referenceDiv);
+        //verseContentDiv.appendChild(referenceDiv);
         verseContentDiv.appendChild(textDiv);
 
         verseContainer.appendChild(verseNumberDiv);
