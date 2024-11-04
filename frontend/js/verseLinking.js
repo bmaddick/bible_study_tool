@@ -75,8 +75,13 @@ class VerseLinkingService {
             this.selectedVerses.add(verseReference);
             verseElement.classList.add('selected');
         }
+        // After updating selection state, trigger AI analysis
+        if (this.selectedVerses.size > 0) {
+            const selectedRefs = Array.from(this.selectedVerses);
+            await aiService.analyzeVerses(selectedRefs);
+        }
 
-        await this.updateRelatedVerses();
+        // await this.updateRelatedVerses();
     }
 
     async updateRelatedVerses() {
@@ -131,6 +136,12 @@ class VerseLinkingService {
     async displayChapter(book, chapter, highlightVerse = null) {
         this.currentBook = book;
         this.currentChapter = chapter;
+        // Clear selected verses when changing chapters
+        this.selectedVerses.clear();
+        const relatedVersesContainer = document.querySelector('.related-verses-content');
+            if (relatedVersesContainer) {
+                relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see related verses</p>';
+        }
 
         const chapterContent = document.querySelector('.chapter-content');
         const chapterReference = document.querySelector('.chapter-reference');

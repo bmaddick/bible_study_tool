@@ -1,4 +1,81 @@
-import { config } from './config.js';
+import { simulateDebate, formatDebateResponse } from './debate.js';
+import { handleApologeticsQuery, formatApologeticsResponse } from './apologetics.js';
+
+class AIService {
+    constructor() {
+        this.relatedVersesContainer = document.querySelector('.related-verses-content');
+    }
+
+    async analyzeVerses(selectedRefs) {
+        if (!this.relatedVersesContainer) {
+            console.error('Related verses container not found');
+            return;
+        }
+
+        // Show loading state
+        this.relatedVersesContainer.innerHTML = '<p class="loading">Analyzing verses...</p>';
+
+        try {
+            const response = await fetch('/api/gpt/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    verses: selectedRefs,
+                    prompt: "You are a theologian well-versed in Protestant beliefs \
+                    with balanced theology that is extremely biblical. Please take \
+                    these verses ( '${verses.join(', ')}' ) and comment on their meaning in \
+                    one to two sentences. Then provide related verses so the user can \
+                    investigate the Bible more deeply and relate these verses to other \
+                    locations in the Bible with similar messaging."
+                     // Placeholder for your custom prompt
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to get verse analysis');
+            }
+
+            const analysis = await response.json();
+            this.relatedVersesContainer.innerHTML = analysis.html;
+
+        } catch (error) {
+            console.error('Error analyzing verses:', error);
+            this.relatedVersesContainer.innerHTML = `
+                <div class="error-message">
+                    Error analyzing verses. Please try again.
+                    ${error.message ? `<br>Error: ${error.message}` : ''}
+                </div>
+            `;
+        }
+    }
+}
+
+export function initializeAI() {
+    // Initialize AIService instance
+    const aiService = new AIService();
+
+    // Initialize containers
+    const historicalContextContainer = document.querySelector('[aria-label="Historical Context"] .historical-context-content');
+    const theologicalInsightsContainer = document.querySelector('[aria-label="Theological Insights"] .theological-insights-content');
+
+    if (!historicalContextContainer || !theologicalInsightsContainer) {
+        console.warn('AI containers not found, skipping AI initialization');
+        return;
+    }
+
+    // Return the initialized AIService instance
+    return aiService;
+}
+
+// Export AIService for use in other modules
+export const aiService = new AIService();
+
+/* import { config } from './config.js';
+import { simulateDebate, formatDebateResponse } from './debate.js';
+import { handleApologeticsQuery, formatApologeticsResponse } from './apologetics.js';
+
 
 class AIService {
     constructor() {
@@ -153,4 +230,4 @@ class AIService {
     }
 }
 
-export { AIService };
+export { AIService }; */
