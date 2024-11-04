@@ -2,6 +2,7 @@ node_modules/
 .DS_Store
 *.log
 frontend/js/config.js
+.env
 
 # Keep template files
 !frontend/js/config.template.js
