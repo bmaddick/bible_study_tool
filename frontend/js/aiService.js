@@ -16,19 +16,19 @@ class AIService {
         this.relatedVersesContainer.innerHTML = '<p class="loading">Analyzing verses...</p>';
 
         try {
-            const response = await fetch('/api/gpt/analyze', {
+            const response = await fetch('http://localhost:3001/api/gpt/analyze', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     verses: selectedRefs,
-                    prompt: "You are a theologian well-versed in Protestant beliefs \
-                    with balanced theology that is extremely biblical. Please take \
-                    these verses ( '${verses.join(', ')}' ) and comment on their meaning in \
-                    one to two sentences. Then provide related verses so the user can \
-                    investigate the Bible more deeply and relate these verses to other \
-                    locations in the Bible with similar messaging."
+                    prompt: `You are a theologian well-versed in Protestant beliefs \\
+                    with balanced theology that is extremely biblical. Please take \\
+                    these verses ( ${selectedRefs.join(', ')} ) and comment on their meaning in \\
+                    one to two sentences. Then provide related verses so the user can \\
+                    investigate the Bible more deeply and relate these verses to other \\
+                    locations in the Bible with similar messaging.`
                      // Placeholder for your custom prompt
                 })
             });

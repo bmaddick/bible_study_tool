@@ -1,5 +1,6 @@
 // verseLinking.js - Handles verse selection and related verse display functionality
 import { displayService } from './displayService.js';
+import { aiService } from './aiService.js';
 
 class VerseLinkingService {
     constructor(bibleService) {
