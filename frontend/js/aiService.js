@@ -25,10 +25,15 @@ class AIService {
                     verses: selectedRefs,
                     prompt: `You are a theologian well-versed in Protestant beliefs \\
                     with balanced theology that is extremely biblical. Please take \\
-                    these verses ( ${selectedRefs.join(', ')} ) and comment on their meaning in \\
-                    one to two sentences. Then provide related verses so the user can \\
+                    these verses ( ${selectedRefs.join(', ')} ) and comment on their joint meaning in \\
+                    two to three sentences. Then provide related verses so the user can \\
                     investigate the Bible more deeply and relate these verses to other \\
-                    locations in the Bible with similar messaging.`
+                    locations in the Bible with similar messaging. Structure your output like \\
+                    this: "This verse [what the verse is about or means]. Other verses that \\
+                    discuss similar themes or dig in further are [other verses to check out]. \\
+                    End with a poignant, crisp summary of a key point. Don't use transition \\
+                    phrases like "in summary," or "thus". Do not reiterate the selected verses \\
+                    in your response. Break up your response with new lines for readability.`
                      // Placeholder for your custom prompt
                 })
             });
