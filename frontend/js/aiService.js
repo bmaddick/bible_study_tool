@@ -5,6 +5,7 @@ class AIService {
     constructor() {
         this.relatedVersesContainer = document.querySelector('.related-verses-content');
         this.historicalContextContainer = document.querySelector('.historical-context-content');
+        this.theologicalInsightsContainer = document.querySelector('.theological-insights-content');
     }
 
     async getHistoricalContext(selectedRefs) {
@@ -24,7 +25,7 @@ class AIService {
                 },
                 body: JSON.stringify({
                     verses: selectedRefs,
-                    prompt: `Provide historical context for the following Bible verse(s): ${selectedRefs.join(', ')}. 
+                    prompt: `Provide historical context for these Bible verse(s) together: ${selectedRefs.join(', ')}. 
                     Include the most important information from the following options. You can include 
                     multiple if necessary.
                    - The time period when this was written (if it affects the interpretation)
@@ -48,6 +49,50 @@ class AIService {
             this.historicalContextContainer.innerHTML = `
                 <div class="error-message">
                     Error getting historical context. Please try again.
+                    ${error.message ? `<br>Error: ${error.message}` : ''}
+                </div>
+            `;
+        }
+    }
+
+    async getTheologicalInsights(selectedRefs) {
+        if (!this.theologicalInsightsContainer) {
+            console.error('Theological insights container not found');
+            return;
+        }
+    
+        // Show loading state
+        this.theologicalInsightsContainer.innerHTML = '<p class="loading">loading...</p>';
+    
+        try {
+            const response = await fetch('http://localhost:3001/api/gpt/theological-insights', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    verses: selectedRefs,
+                    prompt: `Analyze the theological significance of these Bible verses jointly: ${selectedRefs.join(', ')}. 
+                    Consider any Implications for Christian faith and practice. Highlight any Christian
+                    debate around the interpretation of these verses. If relevant, connect it to the broader 
+                    biblical narrative and redemptive history. Your response should usually be 
+                    one sentence. Be succinct, concise, and crisp in your response. If the verse is very theologically dense, then you can do a longer 
+                    explanation.`
+                })
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to get theological insights');
+            }
+    
+            const analysis = await response.json();
+            this.theologicalInsightsContainer.innerHTML = analysis.html;
+    
+        } catch (error) {
+            console.error('Error getting theological insights:', error);
+            this.theologicalInsightsContainer.innerHTML = `
+                <div class="error-message">
+                    Error getting theological insights. Please try again.
                     ${error.message ? `<br>Error: ${error.message}` : ''}
                 </div>
             `;

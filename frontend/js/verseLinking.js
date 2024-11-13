@@ -82,13 +82,15 @@ class VerseLinkingService {
             await aiService.analyzeVerses(selectedRefs);
             await Promise.all([
                 aiService.analyzeVerses(selectedRefs),
-                aiService.getHistoricalContext(selectedRefs)
+                aiService.getHistoricalContext(selectedRefs),
+                aiService.getTheologicalInsights(selectedRefs)
             ]);
         }
         else {
             // Clear both containers when no verses are selected
             aiService.relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see related verses</p>';
             aiService.historicalContextContainer.innerHTML = '<p class="empty-state">Select a verse to see historical context</p>';
+            aiService.theologicalInsightsContainer.innerHTML = '<p class="empty-state">Select a verse to see theological insights</p>';
         }
 
         // await this.updateRelatedVerses();
@@ -151,6 +153,7 @@ class VerseLinkingService {
         // Clear both containers
         aiService.relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see related verses</p>';
         aiService.historicalContextContainer.innerHTML = '<p class="empty-state">Select a verse to see historical context</p>';
+        aiService.theologicalInsightsContainer.innerHTML = '<p class="empty-state">Select a verse to see theological insights</p>'; 
 
         const chapterContent = document.querySelector('.chapter-content');
         const chapterReference = document.querySelector('.chapter-reference');

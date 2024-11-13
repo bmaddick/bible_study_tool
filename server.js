@@ -70,13 +70,53 @@ app.post('/api/gpt/historical-context', async (req, res) => {
                 .map(para => `<p>${para.replace(/\\n/g, '<br>')}</p>`)
                 .join('')
         });
-        
+
     } catch (error) {
         console.error('Error in /api/gpt/historical-context:', error);
         res.status(500).json({
             error: 'Internal server error',
             details: error.message
         });
+    }
+});
+
+app.post('/api/gpt/theological-insights', async (req, res) => {
+    try {
+        const { verses, prompt } = req.body;
+
+        if (!verses || !Array.isArray(verses)) {
+            return res.status(400).json({ error: 'Invalid verses format' });
+        }
+
+        const completion = await openai.chat.completions.create({
+            model: "gpt-4",
+            messages: [
+                {
+                    role: "system",
+                    content: `You are a knowledgeable theologian with expertise in Protestant theology and biblical interpretation. Your responses should be biblically grounded and focused on theological implications.`
+                },
+                {
+                    role: "user",
+                    content: prompt || `Analyze the theological significance of these Bible verses: ${verses.join(', ')}. Consider:
+                        1. Key theological themes and doctrines present
+                        2. How this passage contributes to our understanding of God's character
+                        3. Implications for Christian faith and practice
+                        4. Connection to the broader biblical narrative and redemptive history
+
+                        Format your response with clear paragraphs and line breaks for readability.`
+                }
+            ]
+        });
+
+        const formattedResponse = completion.choices[0].message.content
+            .split('\\n')
+            .map(line => `<p>${line}</p>`)
+            .join('');
+
+        res.json({ html: formattedResponse });
+    } catch (error) {
+        console.error('Error in theological insights:', error);
+        res.status(500).json({ error: 'Failed to get theological insights' });
     }
 });
 
