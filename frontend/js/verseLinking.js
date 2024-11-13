@@ -80,6 +80,15 @@ class VerseLinkingService {
         if (this.selectedVerses.size > 0) {
             const selectedRefs = Array.from(this.selectedVerses);
             await aiService.analyzeVerses(selectedRefs);
+            await Promise.all([
+                aiService.analyzeVerses(selectedRefs),
+                aiService.getHistoricalContext(selectedRefs)
+            ]);
+        }
+        else {
+            // Clear both containers when no verses are selected
+            aiService.relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see related verses</p>';
+            aiService.historicalContextContainer.innerHTML = '<p class="empty-state">Select a verse to see historical context</p>';
         }
 
         // await this.updateRelatedVerses();
@@ -139,10 +148,9 @@ class VerseLinkingService {
         this.currentChapter = chapter;
         // Clear selected verses when changing chapters
         this.selectedVerses.clear();
-        const relatedVersesContainer = document.querySelector('.related-verses-content');
-            if (relatedVersesContainer) {
-                relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see related verses</p>';
-        }
+        // Clear both containers
+        aiService.relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see related verses</p>';
+        aiService.historicalContextContainer.innerHTML = '<p class="empty-state">Select a verse to see historical context</p>';
 
         const chapterContent = document.querySelector('.chapter-content');
         const chapterReference = document.querySelector('.chapter-reference');
