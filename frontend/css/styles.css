@@ -214,8 +214,9 @@ body {
 .related-verses-content,
 .historical-context-content,
 .theological-insights-content {
-    margin-top: 1rem;
-    line-height: 1.6;
+    white-space: pre-wrap;
+    line-height: 1.5;
+    padding: 1rem;
 }
 
 .loading-state {
