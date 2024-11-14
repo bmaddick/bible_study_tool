@@ -25,15 +25,18 @@ class AIService {
                 },
                 body: JSON.stringify({
                     verses: selectedRefs,
-                    prompt: `Provide historical context for these Bible verse(s) together: ${selectedRefs.join(', ')}. 
-                    Include the most important information from the following options. You can include 
-                    multiple if necessary.
-                   - The time period when this was written (if it affects the interpretation)
-                   - Cultural and historical background (if it affects the interpretation)
-                   - Significant historical events or customs relevant to understanding this verse (if needed)
-                   - Archaeological evidence or historical documents that provide context (if available)
+                    prompt: `You are a theologian well-versed in Protestant beliefs 
+                    with balanced theology that is extremely biblical.
+                    Provide historical context for these Bible verse(s) together: ${selectedRefs.join(', ')}. 
+                    Only include information from one or two of the following options:
+                   - The time period when this was written and what was happening in the world
+                   - Defining things that were common at the time but are not common today, such as definitions of measurement.
+                   - Significant historical events or customs relevant to understanding this verse.
                    Please format your response in one to two sentences with line breaks between the sentences.
-                   Ensure your response is concise and in line with Christian biblical beliefs.`
+                   Ensure your response is concise and in line with Christian biblical beliefs. Do not include
+                   anything that would challenge the Christian story or the accuracy of the Bible.
+                   
+                   do not include the contents of the verse in your response.`
                 })
             });
     
@@ -72,12 +75,17 @@ class AIService {
                 },
                 body: JSON.stringify({
                     verses: selectedRefs,
-                    prompt: `Analyze the theological significance of these Bible verses jointly: ${selectedRefs.join(', ')}. 
-                    Consider any Implications for Christian faith and practice. Highlight any Christian
-                    debate around the interpretation of these verses. If relevant, connect it to the broader 
-                    biblical narrative and redemptive history. Your response should usually be 
-                    one sentence. Be succinct, concise, and crisp in your response. If the verse is very theologically dense, then you can do a longer 
-                    explanation.`
+                    prompt: `You are a theologian well-versed in Protestant beliefs 
+                    with balanced theology that is extremely biblical.
+                    Analyze the theological significance of these Bible verses jointly: ${selectedRefs.join(', ')}. 
+                    Get straight to the point. Don't say things like "this verse states... [verse contents]"
+                    Do not repeat the contents of the verse(s). Tell the reader how the verses are interpreted. If there
+                    is debate, mention the different perspectives. Be succinct, concise, and crisp in your response. Your response should usually be 
+                    one or two sentences.
+                    
+                    break your response into multiple lines whenever possible. 
+                    
+                    do not include the contents of the verse in your response.`
                 })
             });
     
@@ -116,17 +124,17 @@ class AIService {
                 },
                 body: JSON.stringify({
                     verses: selectedRefs,
-                    prompt: `You are a theologian well-versed in Protestant beliefs \\
-                    with balanced theology that is extremely biblical. Please take \\
-                    these verses ( ${selectedRefs.join(', ')} ) and comment on their joint meaning in \\
-                    two to three sentences. Then provide related verses so the user can \\
-                    investigate the Bible more deeply and relate these verses to other \\
-                    locations in the Bible with similar messaging. Structure your output like \\
-                    this: "This verse [what the verse is about or means]. Other verses that \\
-                    discuss similar themes or dig in further are [other verses to check out]. \\
-                    End with a poignant, crisp summary of a key point. Don't use transition \\
-                    phrases like "in summary," or "thus". Do not reiterate the selected verses \\
-                    in your response. Break up your response with new lines for readability.`
+                    prompt: `You are a theologian well-versed in Protestant beliefs 
+                    with balanced theology that is extremely biblical. You communicate in short, crisp sentences. Please 
+                    consider these verses ( ${selectedRefs.join(', ')} ). Respond with this template:
+                    The verse(s) [verses' book and verse number] [what the verses mean jointly - feel free to go beyond
+                    surface level meaning. You're a theologian after all]. Some verses other 
+                    verses to check out are [other verses to check out].
+                    
+                    Don't use transition phrases like "in summary," or "thus". Do not reiterate the selected verses 
+                    in your response. Break up your response with new lines for readability. Be concise.
+                    
+                    do not include the contents of the verse in your response.`
                      // Placeholder for your custom prompt
                 })
             });

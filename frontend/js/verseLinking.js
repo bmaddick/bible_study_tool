@@ -76,6 +76,7 @@ class VerseLinkingService {
             this.selectedVerses.add(verseReference);
             verseElement.classList.add('selected');
         }
+
         // After updating selection state, trigger AI analysis
         if (this.selectedVerses.size > 0) {
             const selectedRefs = Array.from(this.selectedVerses);
@@ -98,40 +99,21 @@ class VerseLinkingService {
 
     async updateRelatedVerses() {
         const relatedVersesContainer = document.querySelector('.related-verses-content');
+        const historicalContextContainer = document.querySelector('.historical-context-content');
+        const theologicalInsightsContainer = document.querySelector('.theological-insights-content');
         if (!relatedVersesContainer) return;
 
         // Clear existing content immediately
         relatedVersesContainer.innerHTML = '';
+        historicalContextContainer.innerHTML = '';
+        theologicalInsightsContainer.innerHTML = '';
 
         // Show empty state if no verses are selected
         if (this.selectedVerses.size === 0) {
             relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see related verses</p>';
+            historicalContextContainer.innerHTML = '<p class="empty-state">Select a verse to see historical context</p>';
+            theologicalInsightsContainer.innerHTML = '<p class="empty-state">Select a verse to see theological insights</p>';
             return;
-        }
-
-        const relatedVerses = await this.getRelatedVerses(Array.from(this.selectedVerses));
-
-        // Add related verses
-        for (const verse of relatedVerses) {
-            const verseElement = document.createElement('div');
-            verseElement.classList.add('related-verse');
-
-            // Fetch the actual verse text from BibleService using the full reference
-            let verseText = 'Verse text not available';
-            try {
-                const verseData = await this.bibleService.getVerse(verse.reference);
-                if (verseData && verseData.text) {
-                    verseText = verseData.text;
-                }
-            } catch (error) {
-                console.error(`Error fetching verse text for ${verse.reference}:`, error);
-            }
-
-            verseElement.innerHTML = `
-                <div class="verse-reference">${verse.reference}</div>
-                <div class="verse-text">${verseText}</div>
-            `;
-            relatedVersesContainer.appendChild(verseElement);
         }
     }
 

@@ -107,7 +107,7 @@ body {
     display: grid;
     grid-template-columns: 2fr 1fr; /* Adjusted for a wider layout */
     gap: 2rem;
-    max-width: 80vw; /* Use 90% of viewport width instead of fixed 1400px */
+    max-width: 90vw; /* Use 90% of viewport width instead of fixed 1400px */
     margin: 0 auto;
     padding: 2rem;
 }
@@ -321,7 +321,8 @@ body {
 
 /* Home Page Styles */
 .content {
-    max-width: 70vw;
+    width: 70vw;
+    max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
     text-align: center;
