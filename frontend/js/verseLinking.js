@@ -80,7 +80,10 @@ class VerseLinkingService {
         // After updating selection state, trigger AI analysis
         if (this.selectedVerses.size > 0) {
             const selectedRefs = Array.from(this.selectedVerses);
-            await aiService.analyzeVerses(selectedRefs);
+            // Set all loading states immediately
+            aiService.relatedVersesContainer.innerHTML = '<p class="loading">loading...</p>';
+            aiService.historicalContextContainer.innerHTML = '<p class="loading">loading...</p>';
+            aiService.theologicalInsightsContainer.innerHTML = '<p class="loading">loading...</p>';
             await Promise.all([
                 aiService.analyzeVerses(selectedRefs),
                 aiService.getHistoricalContext(selectedRefs),

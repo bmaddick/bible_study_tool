@@ -105,13 +105,12 @@ body {
 /* Study Container Layout */
 .study-container {
     display: grid;
-    grid-template-columns: 2fr 1fr; /* Adjusted for a wider layout */
+    grid-template-columns: 3fr 2fr;  /* Changed from 2fr 1fr */
     gap: 2rem;
-    max-width: 90vw; /* Use 90% of viewport width instead of fixed 1400px */
+    max-width: 95vw;  /* Changed from 90vw */
     margin: 0 auto;
     padding: 2rem;
 }
-
 
 .chapter-container {
     background: var(--background-color);
