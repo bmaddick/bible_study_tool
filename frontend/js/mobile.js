@@ -1,21 +1,36 @@
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Mobile.js loaded');  // Add this line here
     const trigger = document.getElementById('analysis-trigger');
     const panel = document.getElementById('analysis-panel');
-    console.log('got element');  // Add this line here
+    const backdrop = document.querySelector('.panel-backdrop');
     const closeBtn = panel.querySelector('.close-panel');
 
-    if (trigger && panel && closeBtn) {
-        trigger.addEventListener('click', () => {
-            console.log('execute check open one');  
-            panel.classList.add('active');
-            console.log('execute check open two');  
-        });
+    function openPanel() {
+        panel.classList.add('active');
+        backdrop.classList.add('active');
+    }
 
-        closeBtn.addEventListener('click', () => {
-            panel.classList.remove('active');
+    function closePanel() {
+        panel.classList.remove('active');
+        backdrop.classList.remove('active');
+    }
+
+    if (trigger && panel && backdrop && closeBtn) {
+        trigger.addEventListener('click', openPanel);
+        closeBtn.addEventListener('click', closePanel);
+        // Handle double-click on backdrop
+        backdrop.addEventListener('dblclick', (e) => {
+            if (e.target === backdrop) {
+                closePanel();
+            }
+        });
+        // Prevent single clicks from passing through to verses
+        backdrop.addEventListener('click', (e) => {
+            if (e.target === backdrop) {
+                e.stopPropagation();
+            }
         });
     }
+
     // Watch for changes in the main analysis container
     const observer = new MutationObserver(updateMobilePanel);
     const mainContent = document.querySelector('.analysis-container');
