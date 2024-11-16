@@ -18,6 +18,23 @@ export class BibleService {
 
     // Parse reference into standardized format and handle verse ranges
     parseReference(reference) {
+       // Normalize case at start
+        reference = reference.toLowerCase();
+        
+        // Remove any text after hyphen and trim
+        reference = reference.split(' - ')[0].trim();
+
+        // Convert numeric prefixes to written form
+        reference = reference.replace(/^(\\d+)\\s+/, (match, num) => {
+            const numbers = ['First', 'Second', 'Third'];
+            return `${numbers[parseInt(num) - 1] || num} `;
+        });
+
+        // Capitalize first letter of each word for book names
+        reference = reference.split(' ')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+            
         console.log(`Parsing reference: ${reference}`);
         // Remove any text after hyphen and trim
         reference = reference.split(' - ')[0].trim();
