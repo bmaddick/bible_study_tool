@@ -6,6 +6,8 @@ import { initializeAI } from './ai.js';
 import VerseLinkingService from './verseLinking.js';
 import { BibleService } from './bibleService.js';
 import { DisplayService, displayService } from './displayService.js';
+console.log('Loading mobile.js');
+import './mobile.js';
 
 // Initialize all modules when DOM is loaded
 document.addEventListener('DOMContentLoaded', async () => {
