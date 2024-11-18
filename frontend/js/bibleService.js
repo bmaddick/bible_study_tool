@@ -18,32 +18,26 @@ export class BibleService {
 
     // Parse reference into standardized format and handle verse ranges
     parseReference(reference) {
-       // Normalize case at start
+       // Handle multiple references by splitting on 'and'
+        if (reference.includes(' and ')) {
+            const refs = reference.split(' and ');
+            return refs.map(ref => this.parseReference(ref.trim())).flat();
+        }
+        // Normalize case at start
         reference = reference.toLowerCase();
+
+        reference = this.normalizeBookName(reference);
+        console.log("After normalization:", reference);
         
         // Remove any text after hyphen and trim
         reference = reference.split(' - ')[0].trim();
 
-        // Convert numeric prefixes to written form
-        reference = reference.replace(/^(\\d+)\\s+/, (match, num) => {
-            const numbers = ['First', 'Second', 'Third'];
-            return `${numbers[parseInt(num) - 1] || num} `;
-        });
-
-        // Capitalize first letter of each word for book names
+        // Capitalize first letter of each word
         reference = reference.split(' ')
             .map(word => word.charAt(0).toUpperCase() + word.slice(1))
             .join(' ');
-            
-        console.log(`Parsing reference: ${reference}`);
-        // Remove any text after hyphen and trim
-        reference = reference.split(' - ')[0].trim();
 
-        // Convert numeric prefixes to written form
-        reference = reference.replace(/^(\d+)\s+/, (match, num) => {
-            const numbers = ['First', 'Second', 'Third'];
-            return `${numbers[parseInt(num) - 1] || num} `;
-        });
+        console.log(`Parsing reference: ${reference}`);
 
         // Match patterns for different formats
         const patterns = [
@@ -118,6 +112,27 @@ export class BibleService {
         return references;
     }
 
+    normalizeBookName(name) {
+        const prefixMap = {
+            'first': '1',
+            '1st': '1',
+            'second': '2',
+            '2nd': '2',
+            'third': '3',
+            '3rd': '3',
+            'First': '1',
+            'Second': '2',
+            'Third': '3',
+        };
+        
+        const [first, ...rest] = name.toLowerCase().trim().split(' ');
+        const prefix = prefixMap[first] || first;
+        
+        return [prefix, ...rest]
+            .map((word, i) => i === 0 && /^\\d+$/.test(word) ? word : word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
+
     async initialize() {
         if (this.initialized) return;
         if (this.initializationError) throw this.initializationError;
@@ -184,15 +199,8 @@ export class BibleService {
             throw error;
         }
     }
-    normalizeBookName(name) {
-        return name
-            .replace(/^(\d+)\s+/, (match, num) => {
-                const numbers = ['First', 'Second', 'Third'];
-                return `${numbers[parseInt(num) - 1] || num} `;
-            })
-            .replace(/\s+/g, ' ')
-            .trim();
-    }
+    
+    
 
     async buildVerseIndex() {
 
