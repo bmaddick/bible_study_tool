@@ -39,6 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
+window.addEventListener('resize', () => {
+    const panel = document.getElementById('analysis-panel');
+    if (window.innerWidth > 768 && panel.classList.contains('active')) {
+        panel.classList.remove('active');
+    }
+});
+
 function updateMobilePanel() {
     const mainContent = document.querySelector('.analysis-container');
     const mobileContent = document.querySelector('.analysis-panel .analysis-content');

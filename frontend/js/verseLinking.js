@@ -92,7 +92,7 @@ class VerseLinkingService {
         }
         else {
             // Clear both containers when no verses are selected
-            aiService.relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see related verses</p>';
+            aiService.relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see commentary</p>';
             aiService.historicalContextContainer.innerHTML = '<p class="empty-state">Select a verse to see historical context</p>';
             aiService.theologicalInsightsContainer.innerHTML = '<p class="empty-state">Select a verse to see theological insights</p>';
         }
@@ -113,7 +113,7 @@ class VerseLinkingService {
 
         // Show empty state if no verses are selected
         if (this.selectedVerses.size === 0) {
-            relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see related verses</p>';
+            relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see commentary</p>';
             historicalContextContainer.innerHTML = '<p class="empty-state">Select a verse to see historical context</p>';
             theologicalInsightsContainer.innerHTML = '<p class="empty-state">Select a verse to see theological insights</p>';
             return;
@@ -136,7 +136,7 @@ class VerseLinkingService {
         // Clear selected verses when changing chapters
         this.selectedVerses.clear();
         // Clear both containers
-        aiService.relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see related verses</p>';
+        aiService.relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see commentary</p>';
         aiService.historicalContextContainer.innerHTML = '<p class="empty-state">Select a verse to see historical context</p>';
         aiService.theologicalInsightsContainer.innerHTML = '<p class="empty-state">Select a verse to see theological insights</p>'; 
 

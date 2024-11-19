@@ -585,3 +585,9 @@ body {
         color: #4A5568;
     }
 }
+
+@media (min-width: 769px) {
+    #analysis-panel.active {
+        display: none;
+    }
+}
