@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const panel = document.getElementById('analysis-panel');
     const backdrop = document.querySelector('.panel-backdrop');
     const closeBtn = panel.querySelector('.close-panel');
+    const content = document.querySelector('.panel-body');
 
     function openPanel() {
         panel.classList.add('active');
@@ -37,13 +38,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (mainContent) {
         observer.observe(mainContent, { childList: true, subtree: true });
     }
-});
 
-window.addEventListener('resize', () => {
-    const panel = document.getElementById('analysis-panel');
-    if (window.innerWidth > 768 && panel.classList.contains('active')) {
-        panel.classList.remove('active');
-    }
+    window.addEventListener('resize', () => {
+        const panel = document.getElementById('analysis-panel');
+        if (window.innerWidth > 768 && panel.classList.contains('active')) {
+            panel.classList.remove('active');
+        }
+    });
+    
 });
 
 function updateMobilePanel() {

@@ -455,6 +455,13 @@ body {
     }
 }
 
+@media (min-width: 769px) {
+    .analysis-panel {
+        display: none;
+    }
+}
+
+
 /* Mobile Analysis Panel */
 @media (max-width: 768px) {
     .study-container {
