@@ -124,16 +124,16 @@ class AIService {
                 },
                 body: JSON.stringify({
                     verses: selectedRefs,
-                    prompt: `You are a theologian well-versed in Protestant beliefs 
-                    with balanced theology that is extremely biblical. You communicate in short, crisp sentences. Please 
+                    prompt: `You are a theologian well-versed in Protestant beliefs
+                    with balanced theology that is extremely biblical. You communicate in short, crisp sentences. Please
                     consider these verses ( ${selectedRefs.join(', ')} ). Respond with this template:
                     The verse(s) [verses' book and verse number] [what the verses mean jointly - feel free to go beyond
-                    surface level meaning. You're a theologian after all]. Some verses other 
+                    surface level meaning. You're a theologian after all]. Some verses other
                     verses to check out are [other verses to check out].
-                    
-                    Don't use transition phrases like "in summary," or "thus". Do not reiterate the selected verses 
+
+                    Don't use transition phrases like "in summary," or "thus". Do not reiterate the selected verses
                     in your response. Break up your response with new lines for readability. Be concise.
-                    
+
                     do not include the contents of the verse in your response.`
                      // Placeholder for your custom prompt
                 })
@@ -154,6 +154,43 @@ class AIService {
                     ${error.message ? `<br>Error: ${error.message}` : ''}
                 </div>
             `;
+        }
+    }
+
+    async analyzeQuestion(question) {
+        try {
+            const response = await fetch('http://localhost:3001/api/gpt/question', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    question,
+                    prompt: `You are a theologian well-versed in Protestant beliefs
+                    with balanced theology that is extremely biblical. A person has asked this question: "${question}"
+
+                    Provide a thoughtful, biblical response that:
+                    1. Addresses the question directly
+                    2. References relevant Bible verses (include book, chapter, and verse)
+                    3. Explains the theological principles involved
+                    4. If there are different interpretations among Christians, briefly mention them
+
+                    Format your response with line breaks between main points for readability.
+                    Be concise but thorough. Use clear, simple language.
+                    Ensure your response aligns with traditional Christian biblical beliefs.`
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to analyze question');
+            }
+
+            const analysis = await response.json();
+            return analysis.html;
+
+        } catch (error) {
+            console.error('Error analyzing question:', error);
+            throw new Error('Error analyzing question. Please try again.');
         }
     }
 }
