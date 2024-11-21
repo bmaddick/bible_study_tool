@@ -120,6 +120,40 @@ app.post('/api/gpt/theological-insights', async (req, res) => {
     }
 });
 
+app.post('/api/gpt/question', async (req, res) => {
+    try {
+        const { question, prompt } = req.body;
+
+        if (!question) {
+            return res.status(400).json({ error: 'Question is required' });
+        }
+
+        const completion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo-16k",
+            messages: [
+                {
+                    role: "system",
+                    content: `You are a knowledgeable theologian with expertise in Protestant theology and biblical interpretation. Your responses should be biblically grounded, balanced, and focused on providing clear, helpful answers to theological questions.`
+                },
+                {
+                    role: "user",
+                    content: prompt
+                }
+            ]
+        });
+
+        const formattedResponse = completion.choices[0].message.content
+            .split('\n')
+            .map(line => line.trim() ? `<p>${line}</p>` : '')
+            .join('');
+
+        res.json({ html: formattedResponse });
+    } catch (error) {
+        console.error('Error analyzing question:', error);
+        res.status(500).json({ error: 'Failed to analyze question' });
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
