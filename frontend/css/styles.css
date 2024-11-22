@@ -403,6 +403,19 @@ body {
     font-style: italic;
 }
 
+.message.user p {
+    /*align-self: flex-end;*/
+    background: var(--primary-color);
+    color: #ffffff;
+    padding: 2px 2px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--primary-color);
+    font-weight: 500;
+}
+
 /* Responsive adjustments for home page */
 @media (max-width: 768px) {
     .content {

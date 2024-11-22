@@ -45,6 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             showLoading(true);
             appendUserMessage(message);
+            messageInput.value = '';
 
             const response = await fetch('http://localhost:3001/api/assistant/message', {
                 method: 'POST',
@@ -62,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             appendAssistantMessage(data.messages[0]);
-            messageInput.value = '';
+            
         } catch (error) {
             console.error('Error sending message:', error);
             appendErrorMessage('Failed to get response. Please try again.');
@@ -74,16 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // UI Helper Functions
     function appendUserMessage(message) {
         const messageDiv = document.createElement('div');
-        messageDiv.className = 'message user-message';
-        messageDiv.style.cssText = `
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin: 0.5rem 0 0.5rem auto;
-            max-width: 80%;
-            background-color: var(--primary-color);
-            color: #fff;
-            border: 1px solid var(--primary-color);
-        `;
+        messageDiv.className = 'message user';
         messageDiv.innerHTML = `<p>${escapeHtml(message)}</p>`;
         
         chatHistory.appendChild(messageDiv);
