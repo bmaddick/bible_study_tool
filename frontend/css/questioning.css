@@ -1,4 +1,28 @@
-/* Chat Interface Styles */
+/* Header Section Styles */
+.header-section {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+}
+
+.header-section svg {
+    margin: 0 auto 1rem;
+    display: block;
+}
+
+.header-section h1 {
+    color: var(--primary-color);
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+
+.header-section p {
+    color: var(--text-color);
+    font-size: 1.1rem;
+}
+
+/* Chat Container Styles */
 .chat-container {
     background: var(--background-color);
     border: 1px solid #E2E8F0;
