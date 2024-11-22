@@ -416,6 +416,32 @@ body {
     font-weight: 500;
 }
 
+#new-conversation {
+    background-color: #6B7280;
+    border: 1px solid #4B5563;
+    color: white;
+    transition: background-color 0.2s ease;
+}
+
+#new-conversation:hover {
+    background-color: #4B5563;
+}
+
+#new-conversation:active {
+    background-color: #374151;
+}
+
+#new-conversation:disabled {
+    background-color: #9CA3AF;
+    cursor: not-allowed;
+}
+
+.new-conversation-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
 /* Responsive adjustments for home page */
 @media (max-width: 768px) {
     .content {

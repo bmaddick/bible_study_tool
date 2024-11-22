@@ -169,4 +169,22 @@ document.addEventListener('DOMContentLoaded', () => {
             sendButton.click();
         }
     });
+
+    // Add event listener for new conversation button
+    document.getElementById('new-conversation').addEventListener('click', () => {
+        if (!isLoading) {
+            showLoading(true);
+            chatHistory.innerHTML = ''; // Clear chat history
+            messageInput.value = ''; // Clear input field
+            initializeChat() // Start new chat thread
+                .catch(error => {
+                    console.error('Error:', error);
+                    appendErrorMessage('Failed to start new conversation');
+                })
+                .finally(() => {
+                    showLoading(false);
+                });
+        }
+    });
+
 });
