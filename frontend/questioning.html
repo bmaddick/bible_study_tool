@@ -29,20 +29,34 @@
                     <path d="M2 12L12 17L22 12" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
                 <h1 style="color: var(--primary-color); font-size: 2.5rem; margin-bottom: 0.5rem;">Bible Study Chat</h1>
+                <p style="color: var(--text-color); font-size: 1.1rem;">Have a conversation about the Bible with an AI assistant trained in biblical knowledge.</p>
             </div>
 
-            <div class="step-item" style="background: var(--background-color); padding: 2rem; border-radius: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;">
-                <textarea id="question-input" style="width: 100%; min-height: 150px; padding: 1rem; border: 1px solid #E2E8F0; border-radius: 0.5rem; margin-bottom: 1rem; font-family: var(--font-family);" placeholder="Type your question here..."></textarea>
-                <button id="submit-question" class="search-btn" style="width: 100%; margin-top: 1rem;">Get Biblical Insights</button>
-            </div>
+            <div id="chat-container" class="step-item" style="background: var(--background-color); padding: 2rem; border-radius: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #E2E8F0; min-height: 400px; display: flex; flex-direction: column;">
+                <div id="chat-history" style="flex-grow: 1; overflow-y: auto; margin-bottom: 1rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <!-- Messages will be inserted here -->
+                </div>
 
-            <div id="response-container" class="step-item" style="display: none; margin-top: 2rem; background: var(--background-color); padding: 2rem; border-radius: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;">
-                <h3 style="color: var(--primary-color); font-size: 1.5rem; margin-bottom: 1rem;">Biblical Response</h3>
-                <div id="response-content"></div>
+                <div id="loading-indicator" style="display: none; text-align: center; padding: 1rem;">
+                    <div class="loading-dots">
+                        <span style="color: var(--primary-color)">●</span>
+                        <span style="color: var(--primary-color)">●</span>
+                        <span style="color: var(--primary-color)">●</span>
+                    </div>
+                </div>
+
+                <div class="chat-input-container" style="border-top: 1px solid #E2E8F0; padding-top: 1rem;">
+                    <textarea id="message-input"
+                            style="width: 100%; min-height: 80px; padding: 1rem; border: 1px solid #E2E8F0; border-radius: 0.5rem; margin-bottom: 0.5rem; font-family: var(--font-family); resize: none;"
+                            placeholder="Type your message here..."></textarea>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <button id="send-message" class="search-btn" style="flex: 1;">Send Message</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <p class="note" style="text-align: center; margin-top: 2rem;">AI can make mistakes. Always go to your Bible for validation.</p>
+        <p class="note" style="text-align: center; margin-top: 2rem;">AI can make mistakes. Always verify theological insights with Scripture and trusted sources.</p>
     </main>
 
     <script src="js/questioning.js" type="module"></script>
