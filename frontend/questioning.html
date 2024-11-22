@@ -7,6 +7,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link href="css/reset.css" rel="stylesheet">
     <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/questioning.css">
 </head>
 <body>
     <nav class="main-nav">
@@ -22,28 +23,53 @@
 
     <main class="content">
         <div class="steps">
-            <div class="step-item" style="text-align: center; margin-bottom: 3rem;">
-                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin: 0 auto 1rem;">
+            <div class="step-item header-section">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M2 17L12 22L22 17" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                     <path d="M2 12L12 17L22 12" stroke="var(--primary-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                 </svg>
-                <h1 style="color: var(--primary-color); font-size: 2.5rem; margin-bottom: 0.5rem;">Bible Study Chat</h1>
+                <h1>Bible Study Chat</h1>
+                <p>Have a conversation about the Bible with an AI assistant trained in biblical knowledge.</p>
             </div>
 
-            <div class="step-item" style="background: var(--background-color); padding: 2rem; border-radius: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;">
-                <textarea id="question-input" style="width: 100%; min-height: 150px; padding: 1rem; border: 1px solid #E2E8F0; border-radius: 0.5rem; margin-bottom: 1rem; font-family: var(--font-family);" placeholder="Type your question here..."></textarea>
-                <button id="submit-question" class="search-btn" style="width: 100%; margin-top: 1rem;">Get Biblical Insights</button>
-            </div>
+            <div class="chat-container">
+                <div id="chat-messages" class="chat-messages">
+                    <!-- Messages will be inserted here -->
+                </div>
 
-            <div id="response-container" class="step-item" style="display: none; margin-top: 2rem; background: var(--background-color); padding: 2rem; border-radius: 0.75rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid #E2E8F0;">
-                <h3 style="color: var(--primary-color); font-size: 1.5rem; margin-bottom: 1rem;">Biblical Response</h3>
-                <div id="response-content"></div>
+                <div id="loading-indicator" class="loading-indicator" style="display: none;">
+                    <div class="loading-dots">
+                        <span>●</span>
+                        <span>●</span>
+                        <span>●</span>
+                    </div>
+                </div>
+
+                <div class="chat-input-container">
+                    <textarea id="message-input" class="chat-input"
+                              placeholder="Type your message here..."></textarea>
+                    <div class="button-container">
+                        <button id="send-message" class="send-button">Send Message</button>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <p class="note" style="text-align: center; margin-top: 2rem;">AI can make mistakes. Always go to your Bible for validation.</p>
+        <p class="note">AI can make mistakes. Always verify theological insights with Scripture and trusted sources.</p>
     </main>
+
+    <!-- Mobile Panel -->
+    <div id="chat-panel" class="chat-panel">
+        <div class="chat-panel-header">
+            <h3>Bible Study Chat</h3>
+            <button class="close-chat-panel">×</button>
+        </div>
+        <div class="chat-panel-content">
+            <!-- Mobile chat content will be synced here -->
+        </div>
+    </div>
+    <div class="chat-panel-backdrop"></div>
 
     <script src="js/questioning.js" type="module"></script>
 </body>

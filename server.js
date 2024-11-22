@@ -154,6 +154,93 @@ app.post('/api/gpt/question', async (req, res) => {
     }
 });
 
+// Assistant ID for Bible Study
+const ASSISTANT_ID = 'asst_9BmgeQ4ztUCjhZU3cKHOgkP2';
+
+// Create a new thread
+app.post('/api/assistant/thread', async (req, res) => {
+    try {
+        console.log('Creating new thread with Assistant ID:', ASSISTANT_ID);
+        const thread = await openai.beta.threads.create();
+        console.log('Thread created:', thread);
+        res.json({ threadId: thread.id });
+    } catch (error) {
+        console.error('Detailed error in thread creation:', error);
+        res.status(500).json({
+            error: 'Failed to create thread',
+            details: error.message,
+            stack: error.stack
+        });
+    }
+});
+
+// Send message and get response
+app.post('/api/assistant/message', async (req, res) => {
+    try {
+        const { threadId, message } = req.body;
+        console.log('Adding message to thread:', threadId);
+
+        // Add the user's message to the thread
+        const threadMessage = await openai.beta.threads.messages.create(threadId, {
+            role: 'user',
+            content: message
+        });
+        console.log('Message added:', threadMessage);
+
+        // Run the assistant
+        console.log('Running assistant on thread');
+        const run = await openai.beta.threads.runs.create(threadId, {
+            assistant_id: ASSISTANT_ID
+        });
+
+        // Wait for the run to complete
+        let runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+        while (runStatus.status === 'queued' || runStatus.status === 'in_progress') {
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            runStatus = await openai.beta.threads.runs.retrieve(threadId, run.id);
+            console.log('Run status:', runStatus.status);
+        }
+
+        if (runStatus.status === 'completed') {
+            // Get the assistant's messages
+            const messages = await openai.beta.threads.messages.list(threadId);
+            const assistantMessages = messages.data
+                .filter(msg => msg.role === 'assistant')
+                .map(msg => msg.content[0].text.value);
+
+            console.log('Assistant messages:', assistantMessages);
+            res.json({ messages: assistantMessages });
+        } else {
+            throw new Error(`Run failed with status: ${runStatus.status}`);
+        }
+    } catch (error) {
+        console.error('Error in message handling:', error);
+        res.status(500).json({
+            error: 'Failed to process message',
+            details: error.message,
+            stack: error.stack
+        });
+    }
+});
+
+// Get thread history
+app.get('/api/assistant/history/:threadId', async (req, res) => {
+    try {
+        const { threadId } = req.params;
+        const messages = await openai.beta.threads.messages.list(threadId);
+
+        const formattedMessages = messages.data.map(msg => ({
+            role: msg.role,
+            content: msg.content[0].text.value
+        }));
+
+        res.json({ messages: formattedMessages });
+    } catch (error) {
+        console.error('Error fetching history:', error);
+        res.status(500).json({ error: 'Failed to fetch message history' });
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);
 });
