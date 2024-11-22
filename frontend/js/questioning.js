@@ -7,7 +7,7 @@ let isLoading = false;
 
 document.addEventListener('DOMContentLoaded', () => {
     // Get DOM elements
-    const chatHistory = document.getElementById('chat-history');
+    const chatHistory = document.getElementById('chat-messages');
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-message');
     const loadingIndicator = document.getElementById('loading-indicator');
@@ -39,6 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Send message and get response
     async function sendMessage(message) {
+       
         if (!currentThreadId || !message.trim()) return;
 
         try {
@@ -60,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             const data = await response.json();
-            data.messages.forEach(msg => appendAssistantMessage(msg));
+            appendAssistantMessage(data.messages[0]);
             messageInput.value = '';
         } catch (error) {
             console.error('Error sending message:', error);
@@ -84,6 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             border: 1px solid var(--primary-color);
         `;
         messageDiv.innerHTML = `<p>${escapeHtml(message)}</p>`;
+        
         chatHistory.appendChild(messageDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
