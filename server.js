@@ -3,6 +3,7 @@ import cors from 'cors';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
 
+app.use(express.static('frontend'));
 dotenv.config();
 const app = express();
 app.use(cors());
