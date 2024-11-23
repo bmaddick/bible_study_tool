@@ -3,11 +3,12 @@ import cors from 'cors';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
 
-app.use(express.static('frontend'));
+
 dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
+app.use(express.static('frontend'));
 
 const port = process.env.PORT || 3001;
 
