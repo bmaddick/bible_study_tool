@@ -1,5 +1,9 @@
 import { simulateDebate, formatDebateResponse } from './debate.js';
 import { handleApologeticsQuery, formatApologeticsResponse } from './apologetics.js';
+import { API_URL } from './config.js';
+
+
+
 
 class AIService {
     constructor() {
@@ -18,7 +22,7 @@ class AIService {
         this.historicalContextContainer.innerHTML = '<p class="loading">loading...</p>';
     
         try {
-            const response = await fetch('http://localhost:3001/api/gpt/historical-context', {
+            const response = await fetch(`${API_URL}/api/gpt/historical-context`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -68,7 +72,7 @@ class AIService {
         this.theologicalInsightsContainer.innerHTML = '<p class="loading">loading...</p>';
     
         try {
-            const response = await fetch('http://localhost:3001/api/gpt/theological-insights', {
+            const response = await fetch(`${API_URL}/api/gpt/theological-insights`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -117,7 +121,7 @@ class AIService {
         this.relatedVersesContainer.innerHTML = '<p class="loading">loading...</p>';
 
         try {
-            const response = await fetch('http://localhost:3001/api/gpt/analyze', {
+            const response = await fetch(`${API_URL}/api/gpt/analyze`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -159,7 +163,7 @@ class AIService {
 
     async analyzeQuestion(question) {
         try {
-            const response = await fetch('http://localhost:3001/api/gpt/question', {
+            const response = await fetch(`${API_URL}/api/gpt/question`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

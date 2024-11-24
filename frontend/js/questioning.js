@@ -1,5 +1,6 @@
 // Import aiService (keeping existing import)
 import { aiService } from './aiService.js';
+import { API_URL } from './config.js';
 
 // Chat state management
 let currentThreadId = null;
@@ -16,7 +17,7 @@ document.addEventListener('DOMContentLoaded', () => {
     async function initializeChat() {
         try {
             showLoading(true);
-            const response = await fetch('http://localhost:3001/api/assistant/thread', {
+            const response = await fetch(`${API_URL}/api/assistant/thread`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' }
             });
@@ -47,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
             appendUserMessage(message);
             messageInput.value = '';
 
-            const response = await fetch('http://localhost:3001/api/assistant/message', {
+            const response = await fetch(`${API_URL}/api/assistant/message`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
