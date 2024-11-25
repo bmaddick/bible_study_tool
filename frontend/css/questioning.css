@@ -151,6 +151,8 @@
 
     .chat-input-container {
         padding: 0.75rem;
+        flex-direction: column;
+        gap: 0.75rem;
     }
 
     /* Slide-up panel for mobile */
@@ -215,5 +217,16 @@
 
     .chat-panel-backdrop.active {
         display: block;
+    }
+
+    .chat-input {
+        width: 100%;
+        margin-bottom: 0.5rem;
+    }
+
+    .send-button {
+        width: 100%;
+        margin-top: 0.25rem;
+        padding: 0.875rem;
     }
 }
