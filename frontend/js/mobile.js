@@ -4,6 +4,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const backdrop = document.querySelector('.panel-backdrop');
     const closeBtn = panel.querySelector('.close-panel');
     const content = document.querySelector('.panel-body');
+    const hamburger = document.querySelector('.hamburger-menu');
+    const navLinks = document.querySelector('.nav-links');
 
     function openPanel() {
         panel.classList.add('active');
@@ -44,6 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.innerWidth > 768 && panel.classList.contains('active')) {
             panel.classList.remove('active');
         }
+    });
+
+    hamburger.addEventListener('click', () => {
+        navLinks.classList.toggle('active');
     });
     
 });
