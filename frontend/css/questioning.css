@@ -50,6 +50,7 @@
     max-width: 80%;
     padding: 1rem;
     border-radius: 0.5rem;
+    white-space: pre-line;
     line-height: 1.5;
 }
 
@@ -139,10 +140,15 @@
 
 /* Mobile Styles */
 @media (max-width: 768px) {
+    .content {
+        width: 95%;
+    }
+    
     .chat-container {
-        margin: 1rem;
-        padding: 1rem;
-        width: auto;
+        margin: .25rem;
+        padding: .25rem;
+        width: 95%;
+        max-width: none;
     }
 
     .message {

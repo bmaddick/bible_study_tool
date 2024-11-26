@@ -5,7 +5,7 @@
     "main": "frontend/index.html",
     "type": "module",
     "scripts": {
-        "start": "node server.js",
+        "start": "concurrently \"http-server frontend -p 3000\" \"PORT=3001 node server.js\"",
         "dev": "concurrently \"http-server frontend -p 3000 -c-1\" \"PORT=3001 node server.js\""
     },
     "keywords": [
@@ -17,6 +17,7 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "concurrently": "^9.1.0",
         "http-server": "^14.1.1"
     },
     "dependencies": {
@@ -27,7 +28,6 @@
         "chalk": "^4.1.2",
         "color-convert": "^2.0.1",
         "color-name": "^1.1.4",
-        "concurrently": "^9.1.0",
         "cors": "^2.8.5",
         "corser": "^2.0.1",
         "debug": "^3.2.7",
