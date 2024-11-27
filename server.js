@@ -28,7 +28,7 @@ app.post('/api/gpt/analyze', async (req, res) => {
 
         // Make API call to GPT using the prompt from aiService
         const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo-16k",
+            model: "gpt-3.5-turbo",
             messages: [{ role: "user", content: prompt }]
         });
 
@@ -56,7 +56,7 @@ app.post('/api/gpt/historical-context', async (req, res) => {
         console.log('Using prompt:', prompt);
 
         const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo-16k",
+            model: "gpt-3.5-turbo",
             messages: [{ role: "user", content: prompt }]
         });
 
@@ -91,7 +91,7 @@ app.post('/api/gpt/theological-insights', async (req, res) => {
         }
 
         const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo-16k",
+            model: "gpt-3.5-turbo",
             messages: [
                 {
                     role: "system",
@@ -131,7 +131,7 @@ app.post('/api/gpt/question', async (req, res) => {
         }
 
         const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo-16k",
+            model: "gpt-3.5-turbo",
             messages: [
                 {
                     role: "system",
