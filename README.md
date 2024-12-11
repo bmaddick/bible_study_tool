@@ -65,3 +65,4 @@ A comprehensive Bible study application that combines scripture reading with AI-
 ## License
 
 This project is licensed under the MIT License.
+# talktome2
