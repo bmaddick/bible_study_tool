@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Send message and get response
     async function sendMessage(message) {
-       
+
         if (!currentThreadId || !message.trim()) return;
 
         try {
@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const data = await response.json();
             appendAssistantMessage(data.messages[0]);
-            
+
         } catch (error) {
             console.error('Error sending message:', error);
             appendErrorMessage('Failed to get response. Please try again.');
@@ -78,7 +78,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const messageDiv = document.createElement('div');
         messageDiv.className = 'message user';
         messageDiv.innerHTML = `<p>${escapeHtml(message)}</p>`;
-        
+
         chatHistory.appendChild(messageDiv);
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
@@ -149,10 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function formatMessage(text) {
-        return text
-            .split('\n\n')
-            .map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`)
-            .join('');
+        // Original: return text.split('\n\n').map(para => `<p>${para.replace(/\n/g, '<br>')}</p>`).join('');
+        return text.split('\n\n').map(para => para).join('\n'); // Removed HTML tags
     }
 
     // Event listeners

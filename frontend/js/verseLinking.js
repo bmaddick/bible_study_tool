@@ -81,9 +81,9 @@ class VerseLinkingService {
         if (this.selectedVerses.size > 0) {
             const selectedRefs = Array.from(this.selectedVerses);
             // Set all loading states immediately
-            aiService.relatedVersesContainer.innerHTML = '<p class="loading">loading...</p>';
-            aiService.historicalContextContainer.innerHTML = '<p class="loading">loading...</p>';
-            aiService.theologicalInsightsContainer.innerHTML = '<p class="loading">loading...</p>';
+            aiService.relatedVersesContainer.innerHTML = 'loading...';
+            aiService.historicalContextContainer.innerHTML = 'loading...';
+            aiService.theologicalInsightsContainer.innerHTML = 'loading...';
             await Promise.all([
                 aiService.analyzeVerses(selectedRefs),
                 aiService.getHistoricalContext(selectedRefs),
@@ -92,9 +92,9 @@ class VerseLinkingService {
         }
         else {
             // Clear both containers when no verses are selected
-            aiService.relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see commentary</p>';
-            aiService.historicalContextContainer.innerHTML = '<p class="empty-state">Select a verse to see historical context</p>';
-            aiService.theologicalInsightsContainer.innerHTML = '<p class="empty-state">Select a verse to see theological insights</p>';
+            aiService.relatedVersesContainer.innerHTML = 'Select a verse number to see commentary';
+            aiService.historicalContextContainer.innerHTML = 'Select a verse to see historical context';
+            aiService.theologicalInsightsContainer.innerHTML = 'Select a verse to see theological insights';
         }
 
         // await this.updateRelatedVerses();
@@ -113,9 +113,13 @@ class VerseLinkingService {
 
         // Show empty state if no verses are selected
         if (this.selectedVerses.size === 0) {
-            relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see commentary</p>';
-            historicalContextContainer.innerHTML = '<p class="empty-state">Select a verse to see historical context</p>';
-            theologicalInsightsContainer.innerHTML = '<p class="empty-state">Select a verse to see theological insights</p>';
+            // Original empty states:
+            // relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see commentary</p>';
+            // historicalContextContainer.innerHTML = '<p class="empty-state">Select a verse to see historical context</p>';
+            // theologicalInsightsContainer.innerHTML = '<p class="empty-state">Select a verse to see theological insights</p>';
+            relatedVersesContainer.innerHTML = 'Select a verse number to see commentary';
+            historicalContextContainer.innerHTML = 'Select a verse to see historical context';
+            theologicalInsightsContainer.innerHTML = 'Select a verse to see theological insights';
             return;
         }
     }
@@ -136,9 +140,13 @@ class VerseLinkingService {
         // Clear selected verses when changing chapters
         this.selectedVerses.clear();
         // Clear both containers
-        aiService.relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see commentary</p>';
-        aiService.historicalContextContainer.innerHTML = '<p class="empty-state">Select a verse to see historical context</p>';
-        aiService.theologicalInsightsContainer.innerHTML = '<p class="empty-state">Select a verse to see theological insights</p>'; 
+        // Original empty states:
+        // aiService.relatedVersesContainer.innerHTML = '<p class="empty-state">Select a verse number to see commentary</p>';
+        // aiService.historicalContextContainer.innerHTML = '<p class="empty-state">Select a verse to see historical context</p>';
+        // aiService.theologicalInsightsContainer.innerHTML = '<p class="empty-state">Select a verse to see theological insights</p>';
+        aiService.relatedVersesContainer.innerHTML = 'Select a verse number to see commentary';
+        aiService.historicalContextContainer.innerHTML = 'Select a verse to see historical context';
+        aiService.theologicalInsightsContainer.innerHTML = 'Select a verse to see theological insights';
 
         const chapterContent = document.querySelector('.chapter-content');
         const chapterReference = document.querySelector('.chapter-reference');

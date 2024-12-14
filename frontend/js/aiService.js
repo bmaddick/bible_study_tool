@@ -17,10 +17,11 @@ class AIService {
             console.error('Historical context container not found');
             return;
         }
-    
+
         // Show loading state
-        this.historicalContextContainer.innerHTML = '<p class="loading">loading...</p>';
-    
+        // Original: this.historicalContextContainer.innerHTML = '<p class="loading">loading...</p>';
+        this.historicalContextContainer.innerHTML = 'loading...';
+
         try {
             const response = await fetch(`${API_URL}/api/gpt/historical-context`, {
                 method: 'POST',
@@ -29,9 +30,9 @@ class AIService {
                 },
                 body: JSON.stringify({
                     verses: selectedRefs,
-                    prompt: `You are a theologian well-versed in Protestant beliefs 
+                    prompt: `You are a theologian well-versed in Protestant beliefs
                     with balanced theology that is extremely biblical.
-                    Provide historical context for these Bible verse(s) together: ${selectedRefs.join(', ')}. 
+                    Provide historical context for these Bible verse(s) together: ${selectedRefs.join(', ')}.
                     Only include information from one or two of the following options:
                    - The time period when this was written and what was happening in the world
                    - Defining things that were common at the time but are not common today, such as definitions of measurement.
@@ -39,26 +40,27 @@ class AIService {
                    Please format your response in one to two sentences with line breaks between the sentences.
                    Ensure your response is concise and in line with Christian biblical beliefs. Do not include
                    anything that would challenge the Christian story or the accuracy of the Bible.
-                   
+
                    do not include the contents of the verse in your response.`
                 })
             });
-    
+
             if (!response.ok) {
                 throw new Error('Failed to get historical context');
             }
-    
+
             const analysis = await response.json();
             this.historicalContextContainer.innerHTML = analysis.html;
-    
+
         } catch (error) {
             console.error('Error getting historical context:', error);
-            this.historicalContextContainer.innerHTML = `
-                <div class="error-message">
-                    Error getting historical context. Please try again.
-                    ${error.message ? `<br>Error: ${error.message}` : ''}
-                </div>
-            `;
+            // Original HTML error message:
+            // this.historicalContextContainer.innerHTML = `
+            //     <div class="error-message">
+            //         Error getting historical context. Please try again.
+            //         ${error.message ? `<br>Error: ${error.message}` : ''}
+            //     </div>`;
+            this.historicalContextContainer.innerHTML = `Error getting historical context. Please try again. ${error.message ? `Error: ${error.message}` : ''}`;
         }
     }
 
@@ -67,10 +69,11 @@ class AIService {
             console.error('Theological insights container not found');
             return;
         }
-    
+
         // Show loading state
-        this.theologicalInsightsContainer.innerHTML = '<p class="loading">loading...</p>';
-    
+        // Original: this.theologicalInsightsContainer.innerHTML = '<p class="loading">loading...</p>';
+        this.theologicalInsightsContainer.innerHTML = 'loading...';
+
         try {
             const response = await fetch(`${API_URL}/api/gpt/theological-insights`, {
                 method: 'POST',
@@ -79,27 +82,27 @@ class AIService {
                 },
                 body: JSON.stringify({
                     verses: selectedRefs,
-                    prompt: `You are a theologian well-versed in Protestant beliefs 
+                    prompt: `You are a theologian well-versed in Protestant beliefs
                     with balanced theology that is extremely biblical.
-                    Analyze the theological significance of these Bible verses jointly: ${selectedRefs.join(', ')}. 
+                    Analyze the theological significance of these Bible verses jointly: ${selectedRefs.join(', ')}.
                     Get straight to the point. Don't say things like "this verse states... [verse contents]"
                     Do not repeat the contents of the verse(s). Tell the reader how the verses are interpreted. If there
-                    is debate, mention the different perspectives. Be succinct, concise, and crisp in your response. Your response should usually be 
+                    is debate, mention the different perspectives. Be succinct, concise, and crisp in your response. Your response should usually be
                     one or two sentences.
-                    
-                    break your response into multiple lines whenever possible. 
-                    
+
+                    break your response into multiple lines whenever possible.
+
                     do not include the contents of the verse in your response.`
                 })
             });
-    
+
             if (!response.ok) {
                 throw new Error('Failed to get theological insights');
             }
-    
+
             const analysis = await response.json();
             this.theologicalInsightsContainer.innerHTML = analysis.html;
-    
+
         } catch (error) {
             console.error('Error getting theological insights:', error);
             this.theologicalInsightsContainer.innerHTML = `
@@ -118,7 +121,8 @@ class AIService {
         }
 
         // Show loading state
-        this.relatedVersesContainer.innerHTML = '<p class="loading">loading...</p>';
+        // Original: this.relatedVersesContainer.innerHTML = '<p class="loading">loading...</p>';
+        this.relatedVersesContainer.innerHTML = 'loading...';
 
         try {
             const response = await fetch(`${API_URL}/api/gpt/analyze`, {
