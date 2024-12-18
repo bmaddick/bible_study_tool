@@ -6,7 +6,10 @@
     "type": "module",
     "scripts": {
         "start": "concurrently \"http-server frontend -p 3000\" \"PORT=3001 node server.js\"",
-        "dev": "concurrently \"http-server frontend -p 3000 -c-1\" \"PORT=3001 node server.js\""
+        "dev": "concurrently \"http-server frontend -p 3000 -c-1\" \"PORT=3001 node server.js\"",
+        "test": "jest",
+        "test:watch": "jest --watch",
+        "test:coverage": "jest --coverage"
     },
     "keywords": [
         "bible",
@@ -16,9 +19,20 @@
     ],
     "author": "",
     "license": "ISC",
+    "jest": {
+        "testEnvironment": "jsdom",
+        "moduleNameMapper": {
+            "^./js/(.*)$": "<rootDir>/frontend/js/$1"
+        },
+        "setupFiles": ["<rootDir>/frontend/js/test/setup.js"]
+    },
     "devDependencies": {
+        "@babel/core": "^7.26.0",
+        "@babel/preset-env": "^7.26.0",
+        "babel-jest": "^29.7.0",
         "concurrently": "^9.1.0",
-        "http-server": "^14.1.1"
+        "http-server": "^14.1.1",
+        "jest": "^29.7.0"
     },
     "dependencies": {
         "ansi-styles": "^4.3.0",
